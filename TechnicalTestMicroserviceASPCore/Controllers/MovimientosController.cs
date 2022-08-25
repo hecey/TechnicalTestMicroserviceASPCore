@@ -57,14 +57,14 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             }
 
 
-            var movimientos = await _movimientoRepository.Find(x => x.Id == movimientoDto.Id);
-            if (movimientos.Any())
+            var movimiento = await _movimientoRepository.Find(x => x.Id == movimientoDto.Id);
+            if (movimiento != null)
             {
                 return BadRequest("Already in database");
             }
 
-            var cuentas = await _cuentaRepository.Find(x => x.NumeroDeCuenta == movimientoDto.NumeroDeCuenta);
-            if (!cuentas.Any())
+            var cuenta = await _cuentaRepository.Find(x => x.NumeroDeCuenta == movimientoDto.NumeroDeCuenta);
+            if (cuenta == null)
             {
                 return BadRequest("Cuenta not found in database");
             }
@@ -84,12 +84,13 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             decimal saldoDisponible = 0;
             decimal saldoAnterior = 0;
 
-            Movimiento ultimoMovimientoCliente = await _movimientoRepository.FindLastBalance(cuentas.First().Id);
+            var ultimoMovimientoCliente = await _movimientoRepository
+                .FindAll(filter: x => x.CuentaId == cuenta.Id, orderBy: q => q.OrderBy(d => d.Fecha));
 
 
             saldoAnterior = ultimoMovimientoCliente is not null ?
-                              ultimoMovimientoCliente.Saldo :
-                              cuentas.First().SaldoInicial;
+                              ultimoMovimientoCliente.First().Saldo :
+                              cuenta.SaldoInicial;
 
             if (movimientoDto.TipoDeMovimiento.Equals("debito"))
             {
@@ -117,7 +118,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
 
 
 
-            var sumaSaldosCuentaHoy = await _movimientoRepository.FindSumBalance(cuentas.First().Id);
+            var sumaSaldosCuentaHoy = await _movimientoRepository.FindDailyBalanceUsed(cuenta.Id);
 
 
             if (sumaSaldosCuentaHoy >= LimiteDiario)
@@ -133,8 +134,8 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 TipoDeMovimiento = movimientoDto.TipoDeMovimiento,
                 Valor = movimientoDto.Valor,
                 Saldo = saldoDisponible,
-                CuentaId = cuentas.First().Id,
-                Cuenta = cuentas.First()
+                CuentaId = cuenta.Id,
+                Cuenta = cuenta
             };
 
             _movimientoRepository.Add(MovimientoNueva);
@@ -150,12 +151,12 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 return BadRequest("No Movimiento to add");
             }
-            var movimientos = await _movimientoRepository.Find(x => x.Id == movimientoDtoUpdate.Id);
-            if (movimientos == null)
+            var movimiento = await _movimientoRepository.Find(x => x.Id == movimientoDtoUpdate.Id);
+            if (movimiento == null)
             {
                 return BadRequest("Movimiento not in database");
             }
-            var movimientodb = movimientos.First();
+            var movimientodb = movimiento;
 
             movimientodb.Fecha = DateTime.Now;
             movimientodb.TipoDeMovimiento = movimientoDtoUpdate.TipoDeMovimiento;
@@ -176,7 +177,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 return BadRequest("Movimiento not found");
             }
-            _movimientoRepository.Delete(movimientodb.First().Id);
+            _movimientoRepository.Delete(movimientodb.Id);
             await _movimientoRepository.Save();
             return Ok(await _movimientoRepository.GetAll());
         }

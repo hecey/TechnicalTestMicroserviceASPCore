@@ -22,10 +22,39 @@ namespace TechnicalTestMicroserviceASPCore.Repositories
         {
             return await Context.Set<TEntity>().ToListAsync();
         }
-        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
+        public async Task<TEntity?> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return await Context.Set<TEntity>().Where(predicate).ToListAsync();
+            return await Context.Set<TEntity>().Where(predicate).FirstOrDefaultAsync();
         }
+
+        public async virtual Task<IEnumerable<TEntity>> FindAll(
+           Expression<Func<TEntity, bool>>? filter = null,
+           Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+           string includeProperties = "")
+        {
+            IQueryable<TEntity> query = Context.Set<TEntity>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in includeProperties.Split
+                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            if (orderBy != null)
+            {
+                return await orderBy(query).ToListAsync();
+            }
+            else
+            {
+                return await query.ToListAsync();
+            }
+        }
+
 
         public void Add(TEntity entity)
         {

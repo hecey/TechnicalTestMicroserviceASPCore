@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TechnicalTestMicroserviceASPCore.Data;
 using TechnicalTestMicroserviceASPCore.Repositories;
+using TechnicalTestMicroserviceASPCore.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<ICuentaRepository, CuentaRepository>();
 builder.Services.AddScoped<IMovimientoRepository, MovimientoRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

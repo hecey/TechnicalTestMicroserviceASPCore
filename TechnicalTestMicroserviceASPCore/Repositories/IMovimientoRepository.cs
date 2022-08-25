@@ -4,9 +4,7 @@ namespace TechnicalTestMicroserviceASPCore.Repositories
 {
     public interface IMovimientoRepository : IRepository<Movimiento>, IDisposable
     {
-        Task<Movimiento> FindLastBalance(int cuentaId);
-
-        Task<decimal> FindSumBalance(int cuentaId);
+        Task<decimal> FindDailyBalanceUsed(int cuentaId);
 
     }
 }

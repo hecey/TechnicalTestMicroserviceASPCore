@@ -50,8 +50,8 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             }
 
 
-            var Cuentas = await _cuentaRepository.Find(x => x.NumeroDeCuenta == cuentaDto.NumeroDeCuenta);
-            if (Cuentas.Any())
+            var Cuenta = await _cuentaRepository.Find(x => x.NumeroDeCuenta == cuentaDto.NumeroDeCuenta);
+            if (Cuenta is not null)
             {
                 return BadRequest("Already in database");
             }
@@ -85,13 +85,13 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 return BadRequest("No Cuenta to add");
             }
-            var cuentas = await _cuentaRepository.Find(x => x.Id == cuentaDtoUpdate.Id);
-            if (!cuentas.Any())
+            var cuentadb = await _cuentaRepository.Find(x => x.Id == cuentaDtoUpdate.Id);
+            if (cuentadb is null)
             {
                 return BadRequest("Cuenta not in database");
             }
 
-            var cuentadb = cuentas.First();
+
             cuentadb.NumeroDeCuenta = cuentaDtoUpdate.NumeroDeCuenta;
             cuentadb.TipoDeCuenta = cuentaDtoUpdate.TipoDeCuenta;
             cuentadb.SaldoInicial = cuentaDtoUpdate.SaldoInicial;
@@ -106,13 +106,13 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         [HttpDelete]
         public async Task<ActionResult<List<CuentaDto>>> RemoveCuenta(CuentaDto cuentaDto)
         {
-            var cuentas = await _cuentaRepository.Find(x => x.Id == cuentaDto.Id);
-            if (!cuentas.Any())
+            var cuentadb = await _cuentaRepository.Find(x => x.Id == cuentaDto.Id);
+            if (cuentadb is null)
             {
                 return BadRequest("Cuenta not found");
             }
 
-            _cuentaRepository.Delete(cuentas.First().Id);
+            _cuentaRepository.Delete(cuentadb.Id);
             await _cuentaRepository.Save();
             return Ok(await _cuentaRepository.GetAll());
         }

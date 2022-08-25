@@ -12,18 +12,7 @@ namespace TechnicalTestMicroserviceASPCore.Repositories
 
         }
 
-        public async Task<Movimiento> FindLastBalance(int cuentaId)
-        {
-            var ultimoMovimiento = await Context.Movimiento
-                .Where(x => x.CuentaId == cuentaId)
-                .OrderByDescending(p => p.Fecha)
-                .ToListAsync();
-
-
-            return ultimoMovimiento.First();
-        }
-
-        public async Task<decimal> FindSumBalance(int cuentaId)
+        public async Task<decimal> FindDailyBalanceUsed(int cuentaId)
         {
             var todaysDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day);
             var sumaSaldosporFecha = await Context.Movimiento

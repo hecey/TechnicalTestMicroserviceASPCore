@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.DTOs;
 using TechnicalTestMicroserviceASPCore.Models;
-using TechnicalTestMicroserviceASPCore.Repositories;
+using TechnicalTestMicroserviceASPCore.UnitOfWork;
 
 namespace TechnicalTestMicroserviceASPCore.Controllers
 {
@@ -9,22 +9,18 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
     [Route("api/[controller]")]
     public class ClientesController : Controller
     {
-        private IClienteRepository _clienteRepository;
 
-
-        public ClientesController(IClienteRepository clienteRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public ClientesController(IUnitOfWork unitOfWork)
         {
-            _clienteRepository = clienteRepository;
+            _unitOfWork = unitOfWork;
 
         }
-
-
-
 
         [HttpGet]
         public async Task<ActionResult<List<ClienteDto>>> Get()
         {
-            var clientes = await _clienteRepository.GetAll();
+            var clientes = await _unitOfWork.Clientes.GetAll();
 
             return Ok(clientes);
 
@@ -34,7 +30,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         public async Task<ActionResult<ClienteDto>> FindCliente(int id)
         {
 
-            var cliente = await _clienteRepository.Get(id);
+            var cliente = await _unitOfWork.Clientes.Get(id);
             if (cliente == null)
             {
                 return BadRequest("cliente not found");
@@ -61,10 +57,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 return BadRequest("Invalid model object");
             }
 
-            var clientes = await _clienteRepository.Find(x => x.Identificacion == clienteDto.Identificacion);
+            var cliente = await _unitOfWork.Clientes.Find(x => x.Identificacion == clienteDto.Identificacion);
 
 
-            if (clientes.Any())
+            if (cliente is not null)
             {
                 return BadRequest("Already in database");
             }
@@ -83,10 +79,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 Estado = clienteDto.Estado
             };
 
-            _clienteRepository.Add(clienteNuevo);
-            await _clienteRepository.Save();
+            _unitOfWork.Clientes.Add(clienteNuevo);
+            await _unitOfWork.Complete();
 
-            return Ok(await _clienteRepository.GetAll());
+            return Ok(await _unitOfWork.Clientes.GetAll());
         }
 
         [HttpPut]
@@ -102,15 +98,15 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 return BadRequest("No hay identificacion de cliente");
             }
 
-            var clientes = await _clienteRepository.Find(x => x.Identificacion == clienteDtoUpdate.Identificacion);
+            var clientedb = await _unitOfWork.Clientes.Find(x => x.Identificacion == clienteDtoUpdate.Identificacion);
 
 
-            if (!clientes.Any())
+            if (clientedb is null)
             {
                 return BadRequest("cliente not in database");
             }
 
-            var clientedb = clientes.First();
+            //var clientedb = clientes.First();
 
 
             clientedb.Id = clienteDtoUpdate.Id;
@@ -123,8 +119,8 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             clientedb.Contrasena = clienteDtoUpdate.Contrasena;
             clientedb.Estado = clienteDtoUpdate.Estado;
 
-            _clienteRepository.Update(clientedb);
-            await _clienteRepository.Save();
+            _unitOfWork.Clientes.Update(clientedb);
+            await _unitOfWork.Complete();
 
             return Ok(clientedb);
         }
@@ -136,20 +132,20 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 return BadRequest("No hay identificacion de cliente");
             }
 
-            var clientes = await _clienteRepository.Find(x => x.Identificacion == cliente.Identificacion);
+            var clientedb = await _unitOfWork.Clientes.Find(x => x.Identificacion == cliente.Identificacion);
 
 
-            if (!clientes.Any())
+            if (clientedb is null)
             {
                 return BadRequest("cliente not found");
             }
-            var clientedb = clientes.First();
 
 
-            _clienteRepository.Delete(clientedb.Id);
-            await _clienteRepository.Save();
 
-            return Ok(await _clienteRepository.GetAll());
+            _unitOfWork.Clientes.Delete(clientedb.Id);
+            await _unitOfWork.Complete();
+
+            return Ok(await _unitOfWork.Clientes.GetAll());
         }
     }
 }
