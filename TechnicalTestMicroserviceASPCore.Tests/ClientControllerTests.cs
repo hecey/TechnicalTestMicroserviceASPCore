@@ -9,7 +9,7 @@ namespace TechnicalTestMicroserviceASPCore.Tests
     public class ClientControllerTests
     {
         [Fact]
-        public async void Get_Returns_a_List_of_clients()
+        public async void Get_Returns_Ok_Response_List_of_clients_When_Data_Exist()
         {
             //Arrange
             int count = 5;
@@ -25,6 +25,26 @@ namespace TechnicalTestMicroserviceASPCore.Tests
             var result = actionResult.Result as OkObjectResult;
             var returnClientes = result != null ? result.Value as IEnumerable<Cliente> : null;
             Assert.Equal(count, returnClientes is not null ? returnClientes.Count() : 0);
+
+
+        }
+
+        [Fact]
+        public async void Get_Returns_NoContent_Response_When_Data_Not_Exist()
+        {
+            //Arrange
+            int count = 0;
+            var fakeClients = A.CollectionOfDummy<Cliente>(count).AsEnumerable();
+            var unitOfWork = A.Fake<IUnitOfWork>();
+            A.CallTo(() => unitOfWork.Clientes.GetAll()).Returns(Task.FromResult(fakeClients));
+            var controller = new ClientesController(unitOfWork);
+
+            //Act
+            var actionResult = await controller.Get();
+
+            //Assert
+            var result = actionResult.Result;
+            Assert.IsType<NoContentResult>(result);
 
 
         }

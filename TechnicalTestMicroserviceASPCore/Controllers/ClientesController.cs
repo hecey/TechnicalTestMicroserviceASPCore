@@ -22,7 +22,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         {
             var clientes = await _unitOfWork.Clientes.GetAll();
 
-            return Ok(clientes);
+            return clientes.Any() ? Ok(clientes) : NoContent();
 
         }
 
