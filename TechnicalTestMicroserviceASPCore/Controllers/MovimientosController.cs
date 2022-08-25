@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.DTOs;
 using TechnicalTestMicroserviceASPCore.Models;
-using TechnicalTestMicroserviceASPCore.Repositories;
+using TechnicalTestMicroserviceASPCore.UnitOfWork;
 
 namespace TechnicalTestMicroserviceASPCore.Controllers
 {
@@ -11,24 +11,19 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
     {
 
         private readonly IConfiguration _configRoot;
+        private readonly IUnitOfWork _unitOfWork;
 
-        private IMovimientoRepository _movimientoRepository;
-        private ICuentaRepository _cuentaRepository;
-
-
-        public MovimientosController(IMovimientoRepository movimientoRepository, ICuentaRepository cuentaRepository, IConfiguration configRoot)
+        public MovimientosController(IUnitOfWork unitOfWork, IConfiguration configRoot)
         {
-            _movimientoRepository = movimientoRepository;
-            _cuentaRepository = cuentaRepository;
+            _unitOfWork = unitOfWork;
             _configRoot = (IConfigurationRoot)configRoot;
 
         }
 
-
         [HttpGet]
         public async Task<ActionResult<List<MovimientoDto>>> Get()
         {
-            var movimiento = await _movimientoRepository.GetAll();
+            var movimiento = await _unitOfWork.Movimientos.GetAll();
 
 
             return Ok(movimiento);
@@ -39,7 +34,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         public async Task<ActionResult<MovimientoDto>> FindMovimiento(int id)
         {
 
-            var movimiento = await _movimientoRepository.Get(id);
+            var movimiento = await _unitOfWork.Movimientos.Get(id);
             if (movimiento == null)
             {
                 return BadRequest("Movimiento not found");
@@ -57,13 +52,13 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             }
 
 
-            var movimiento = await _movimientoRepository.Find(x => x.Id == movimientoDto.Id);
+            var movimiento = await _unitOfWork.Movimientos.Find(x => x.Id == movimientoDto.Id);
             if (movimiento != null)
             {
                 return BadRequest("Already in database");
             }
 
-            var cuenta = await _cuentaRepository.Find(x => x.NumeroDeCuenta == movimientoDto.NumeroDeCuenta);
+            var cuenta = await _unitOfWork.Cuentas.Find(x => x.NumeroDeCuenta == movimientoDto.NumeroDeCuenta);
             if (cuenta == null)
             {
                 return BadRequest("Cuenta not found in database");
@@ -84,7 +79,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             decimal saldoDisponible = 0;
             decimal saldoAnterior = 0;
 
-            var ultimoMovimientoCliente = await _movimientoRepository
+            var ultimoMovimientoCliente = await _unitOfWork.Movimientos
                 .FindAll(filter: x => x.CuentaId == cuenta.Id, orderBy: q => q.OrderBy(d => d.Fecha));
 
 
@@ -118,7 +113,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
 
 
 
-            var sumaSaldosCuentaHoy = await _movimientoRepository.FindDailyBalanceUsed(cuenta.Id);
+            var sumaSaldosCuentaHoy = await _unitOfWork.Movimientos.FindDailyBalanceUsed(cuenta.Id);
 
 
             if (sumaSaldosCuentaHoy >= LimiteDiario)
@@ -138,10 +133,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 Cuenta = cuenta
             };
 
-            _movimientoRepository.Add(MovimientoNueva);
-            await _movimientoRepository.Save();
+            _unitOfWork.Movimientos.Add(MovimientoNueva);
+            await _unitOfWork.Complete();
 
-            return Ok(await _movimientoRepository.GetAll());
+            return Ok(await _unitOfWork.Movimientos.GetAll());
         }
 
         [HttpPut]
@@ -151,7 +146,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 return BadRequest("No Movimiento to add");
             }
-            var movimiento = await _movimientoRepository.Find(x => x.Id == movimientoDtoUpdate.Id);
+            var movimiento = await _unitOfWork.Movimientos.Find(x => x.Id == movimientoDtoUpdate.Id);
             if (movimiento == null)
             {
                 return BadRequest("Movimiento not in database");
@@ -164,7 +159,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             movimientodb.Saldo = movimientoDtoUpdate.Saldo;
             movimientodb.CuentaId = movimientoDtoUpdate.CuentaId;
 
-            await _movimientoRepository.Save();
+            await _unitOfWork.Complete();
 
             return Ok(movimientodb);
         }
@@ -172,14 +167,14 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         [HttpDelete]
         public async Task<ActionResult<List<MovimientoDto>>> RemoveMovimiento(MovimientoDto movimientoDto)
         {
-            var movimientodb = await _movimientoRepository.Find(x => x.Id == movimientoDto.Id);
+            var movimientodb = await _unitOfWork.Movimientos.Find(x => x.Id == movimientoDto.Id);
             if (movimientodb == null)
             {
                 return BadRequest("Movimiento not found");
             }
-            _movimientoRepository.Delete(movimientodb.Id);
-            await _movimientoRepository.Save();
-            return Ok(await _movimientoRepository.GetAll());
+            _unitOfWork.Movimientos.Delete(movimientodb.Id);
+            await _unitOfWork.Complete();
+            return Ok(await _unitOfWork.Movimientos.GetAll());
         }
     }
 }

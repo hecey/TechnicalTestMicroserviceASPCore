@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.DTOs;
 using TechnicalTestMicroserviceASPCore.Models;
-using TechnicalTestMicroserviceASPCore.Repositories;
+using TechnicalTestMicroserviceASPCore.UnitOfWork;
 
 namespace TechnicalTestMicroserviceASPCore.Controllers
 {
@@ -9,20 +9,18 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
     [Route("api/[controller]")]
     public class CuentasController : Controller
     {
-        private ICuentaRepository _cuentaRepository;
-        private IClienteRepository _clienteRepository;
 
-
-        public CuentasController(ICuentaRepository cuentaRepository, IClienteRepository clienteRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public CuentasController(IUnitOfWork unitOfWork)
         {
-            _cuentaRepository = cuentaRepository;
-            _clienteRepository = clienteRepository;
+            _unitOfWork = unitOfWork;
+
         }
 
         [HttpGet]
         public async Task<ActionResult<List<CuentaDto>>> Get()
         {
-            var Cuentas = await _cuentaRepository.GetAll();
+            var Cuentas = await _unitOfWork.Cuentas.GetAll();
 
             return Ok(Cuentas);
 
@@ -32,7 +30,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         public async Task<ActionResult<CuentaDto>> FindCuenta(int id)
         {
 
-            var Cuenta = await _cuentaRepository.Get(id);
+            var Cuenta = await _unitOfWork.Cuentas.Get(id);
             if (Cuenta == null)
             {
                 return BadRequest("Cuenta not found");
@@ -50,13 +48,13 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             }
 
 
-            var Cuenta = await _cuentaRepository.Find(x => x.NumeroDeCuenta == cuentaDto.NumeroDeCuenta);
+            var Cuenta = await _unitOfWork.Cuentas.Find(x => x.NumeroDeCuenta == cuentaDto.NumeroDeCuenta);
             if (Cuenta is not null)
             {
                 return BadRequest("Already in database");
             }
 
-            var cliente = await _clienteRepository.Get(cuentaDto.ClienteId);
+            var cliente = await _unitOfWork.Clientes.Get(cuentaDto.ClienteId);
             if (cliente is null)
             {
                 return BadRequest("Cliente not found in database");
@@ -72,10 +70,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 Cliente = cliente
             };
 
-            _cuentaRepository.Add(cuentaNueva);
-            await _cuentaRepository.Save();
+            _unitOfWork.Cuentas.Add(cuentaNueva);
+            await _unitOfWork.Complete();
 
-            return Ok(await _cuentaRepository.GetAll());
+            return Ok(await _unitOfWork.Cuentas.GetAll());
         }
 
         [HttpPut]
@@ -85,7 +83,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 return BadRequest("No Cuenta to add");
             }
-            var cuentadb = await _cuentaRepository.Find(x => x.Id == cuentaDtoUpdate.Id);
+            var cuentadb = await _unitOfWork.Cuentas.Find(x => x.Id == cuentaDtoUpdate.Id);
             if (cuentadb is null)
             {
                 return BadRequest("Cuenta not in database");
@@ -98,23 +96,23 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             cuentadb.ClienteId = cuentaDtoUpdate.ClienteId;
             cuentadb.Estado = cuentaDtoUpdate.Estado;
 
-            _cuentaRepository.Update(cuentadb);
+            _unitOfWork.Cuentas.Update(cuentadb);
 
-            await _cuentaRepository.Save();
+            await _unitOfWork.Complete();
             return Ok(cuentadb);
         }
         [HttpDelete]
         public async Task<ActionResult<List<CuentaDto>>> RemoveCuenta(CuentaDto cuentaDto)
         {
-            var cuentadb = await _cuentaRepository.Find(x => x.Id == cuentaDto.Id);
+            var cuentadb = await _unitOfWork.Cuentas.Find(x => x.Id == cuentaDto.Id);
             if (cuentadb is null)
             {
                 return BadRequest("Cuenta not found");
             }
 
-            _cuentaRepository.Delete(cuentadb.Id);
-            await _cuentaRepository.Save();
-            return Ok(await _cuentaRepository.GetAll());
+            _unitOfWork.Cuentas.Delete(cuentadb.Id);
+            await _unitOfWork.Complete();
+            return Ok(await _unitOfWork.Cuentas.GetAll());
         }
     }
 }
