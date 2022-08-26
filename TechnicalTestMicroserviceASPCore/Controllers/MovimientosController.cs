@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.DTOs;
 using TechnicalTestMicroserviceASPCore.Models;
 using TechnicalTestMicroserviceASPCore.UnitOfWork;
@@ -12,21 +13,23 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
 
         private readonly IConfiguration _configRoot;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public MovimientosController(IUnitOfWork unitOfWork, IConfiguration configRoot)
+        public MovimientosController(IUnitOfWork unitOfWork, IConfiguration configRoot, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _configRoot = (IConfigurationRoot)configRoot;
+            _mapper = mapper;
 
         }
 
         [HttpGet]
         public async Task<ActionResult<List<MovimientoDto>>> Get()
         {
-            var movimiento = await _unitOfWork.Movimientos.GetAll();
+            var movimientos = await _unitOfWork.Movimientos.GetAll();
+            var movimientosDto = _mapper.Map<IEnumerable<MovimientoDto>>(movimientos);
 
-
-            return Ok(movimiento);
+            return Ok(movimientosDto);
 
         }
 
@@ -39,7 +42,9 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 return BadRequest("Movimiento not found");
             }
-            return Ok(movimiento);
+            var movimientoDto = _mapper.Map<MovimientoDto>(movimiento);
+
+            return Ok(movimientoDto);
 
         }
 
@@ -134,9 +139,11 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             };
 
             _unitOfWork.Movimientos.Add(MovimientoNueva);
-            await _unitOfWork.Complete();
+            var movimientos = await _unitOfWork.Complete();
+            var movimientosDto = _mapper.Map<IEnumerable<MovimientoDto>>(movimientos);
 
-            return Ok(await _unitOfWork.Movimientos.GetAll());
+
+            return Ok(movimientosDto);
         }
 
         [HttpPut]
@@ -159,9 +166,11 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             movimientodb.Saldo = movimientoDtoUpdate.Saldo;
             movimientodb.CuentaId = movimientoDtoUpdate.CuentaId;
 
+            _unitOfWork.Movimientos.Update(movimientodb);
             await _unitOfWork.Complete();
+            var movimientoDto = _mapper.Map<MovimientoDto>(movimientodb);
 
-            return Ok(movimientodb);
+            return Ok(movimientoDto);
         }
 
         [HttpDelete]
@@ -174,7 +183,11 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             }
             _unitOfWork.Movimientos.Delete(movimientodb.Id);
             await _unitOfWork.Complete();
-            return Ok(await _unitOfWork.Movimientos.GetAll());
+
+            var movimientos = await _unitOfWork.Movimientos.GetAll();
+            var movimientosDto = _mapper.Map<IEnumerable<MovimientoDto>>(movimientos);
+
+            return Ok(movimientosDto);
         }
     }
 }

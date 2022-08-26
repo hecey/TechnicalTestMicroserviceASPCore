@@ -37,9 +37,6 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 return StatusCode(500, "Internal server error: " + ex);
             }
 
-
-
-
         }
 
         [HttpGet("{id}")]
@@ -51,7 +48,9 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 return NotFound("cliente not found");
             }
-            return Ok(cliente);
+            var clienteDto = _mapper.Map<ClienteDto>(cliente);
+
+            return Ok(clienteDto);
 
         }
 
@@ -98,7 +97,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             _unitOfWork.Clientes.Add(clienteNuevo);
             await _unitOfWork.Complete();
 
-            return Ok(await _unitOfWork.Clientes.GetAll());
+            var clientes = await _unitOfWork.Clientes.GetAll();
+            var clientesDto = _mapper.Map<IEnumerable<ClienteDto>>(clientes);
+
+            return Ok(clientesDto);
         }
 
         [HttpPut]
@@ -137,7 +139,8 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             _unitOfWork.Clientes.Update(clientedb);
             await _unitOfWork.Complete();
 
-            return Ok(clientedb);
+            var clienteDto = _mapper.Map<ClienteDto>(clientedb);
+            return Ok(clienteDto);
         }
         [HttpDelete]
         public async Task<ActionResult<List<ClienteDto>>> Removecliente(Cliente cliente)
@@ -160,7 +163,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             _unitOfWork.Clientes.Delete(clientedb.Id);
             await _unitOfWork.Complete();
 
-            return Ok(await _unitOfWork.Clientes.GetAll());
+            var clientes = await _unitOfWork.Clientes.GetAll();
+            var clientesDto = _mapper.Map<IEnumerable<ClienteDto>>(clientes);
+
+            return Ok(clientesDto);
         }
     }
 }

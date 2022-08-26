@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.DTOs;
 using TechnicalTestMicroserviceASPCore.Models;
 using TechnicalTestMicroserviceASPCore.UnitOfWork;
@@ -11,18 +12,20 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        public CuentasController(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public CuentasController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
 
         }
 
         [HttpGet]
         public async Task<ActionResult<List<CuentaDto>>> Get()
         {
-            var Cuentas = await _unitOfWork.Cuentas.GetAll();
-
-            return Ok(Cuentas);
+            var cuentas = await _unitOfWork.Cuentas.GetAll();
+            var cuentasDto = _mapper.Map<IEnumerable<CuentaDto>>(cuentas);
+            return Ok(cuentasDto);
 
         }
 
@@ -30,12 +33,14 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         public async Task<ActionResult<CuentaDto>> FindCuenta(int id)
         {
 
-            var Cuenta = await _unitOfWork.Cuentas.Get(id);
-            if (Cuenta == null)
+            var cuenta = await _unitOfWork.Cuentas.Get(id);
+            if (cuenta == null)
             {
                 return BadRequest("Cuenta not found");
             }
-            return Ok(Cuenta);
+            var cuentaDto = _mapper.Map<CuentaDto>(cuenta);
+
+            return Ok(cuentaDto);
 
         }
 
@@ -71,9 +76,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             };
 
             _unitOfWork.Cuentas.Add(cuentaNueva);
-            await _unitOfWork.Complete();
+            var cuentas = await _unitOfWork.Complete();
+            var cuentasDto = _mapper.Map<IEnumerable<CuentaDto>>(cuentas);
 
-            return Ok(await _unitOfWork.Cuentas.GetAll());
+            return Ok(cuentasDto);
         }
 
         [HttpPut]
@@ -97,9 +103,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             cuentadb.Estado = cuentaDtoUpdate.Estado;
 
             _unitOfWork.Cuentas.Update(cuentadb);
-
             await _unitOfWork.Complete();
-            return Ok(cuentadb);
+
+            var cuentaDto = _mapper.Map<CuentaDto>(cuentadb);
+            return Ok(cuentaDto);
         }
         [HttpDelete]
         public async Task<ActionResult<List<CuentaDto>>> RemoveCuenta(CuentaDto cuentaDto)
@@ -112,7 +119,11 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
 
             _unitOfWork.Cuentas.Delete(cuentadb.Id);
             await _unitOfWork.Complete();
-            return Ok(await _unitOfWork.Cuentas.GetAll());
+
+            var cuentas = await _unitOfWork.Cuentas.GetAll();
+            var cuentasDto = _mapper.Map<IEnumerable<CuentaDto>>(cuentas);
+
+            return Ok(cuentasDto);
         }
     }
 }
