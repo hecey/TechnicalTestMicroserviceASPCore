@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.DTOs;
 using TechnicalTestMicroserviceASPCore.Models;
 using TechnicalTestMicroserviceASPCore.UnitOfWork;
@@ -11,18 +12,33 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        public ClientesController(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+
+        public ClientesController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
 
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ClienteDto>>> Get()
+        public async Task<ActionResult<IEnumerable<ClienteDto>>> Get()
         {
-            var clientes = await _unitOfWork.Clientes.GetAll();
 
-            return clientes.Any() ? Ok(clientes) : NoContent();
+            try
+            {
+                var clientes = (List<Cliente>)await _unitOfWork.Clientes.GetAll();
+                var clientesDto = _mapper.Map<IEnumerable<ClienteDto>>(clientes);
+                return clientesDto is not null ? Ok(clientesDto) : NoContent();
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError($"Something went wrong: {ex}");
+                return StatusCode(500, "Internal server error: " + ex);
+            }
+
+
+
 
         }
 
@@ -33,14 +49,14 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             var cliente = await _unitOfWork.Clientes.Get(id);
             if (cliente == null)
             {
-                return BadRequest("cliente not found");
+                return NotFound("cliente not found");
             }
             return Ok(cliente);
 
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Cliente>>> Addcliente(ClienteDto clienteDto)
+        public async Task<ActionResult<List<ClienteDto>>> Addcliente(ClienteDto clienteDto)
         {
             if (clienteDto is null)
             {
@@ -86,11 +102,11 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<Cliente>> Updatecliente(ClienteDto clienteDtoUpdate)
+        public async Task<ActionResult<ClienteDto>> Updatecliente(ClienteDto clienteDtoUpdate)
         {
             if (clienteDtoUpdate == null)
             {
-                return BadRequest("No cliente to add");
+                return NotFound("No cliente to add");
             }
 
             if (clienteDtoUpdate.Identificacion == null)
@@ -106,7 +122,6 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 return BadRequest("cliente not in database");
             }
 
-            //var clientedb = clientes.First();
 
 
             clientedb.Id = clienteDtoUpdate.Id;
@@ -125,7 +140,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             return Ok(clientedb);
         }
         [HttpDelete]
-        public async Task<ActionResult<List<Cliente>>> Removecliente(Cliente cliente)
+        public async Task<ActionResult<List<ClienteDto>>> Removecliente(Cliente cliente)
         {
             if (cliente.Identificacion is null)
             {
@@ -137,7 +152,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
 
             if (clientedb is null)
             {
-                return BadRequest("cliente not found");
+                return NotFound("cliente not found");
             }
 
 

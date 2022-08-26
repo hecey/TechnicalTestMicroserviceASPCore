@@ -1,3 +1,4 @@
+using AutoMapper;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.Controllers;
@@ -15,8 +16,10 @@ namespace TechnicalTestMicroserviceASPCore.Tests
             int count = 5;
             var fakeClients = A.CollectionOfDummy<Movimiento>(count).AsEnumerable();
             var unitOfWork = A.Fake<IUnitOfWork>();
+            var automapper = A.Fake<IMapper>();
+
             A.CallTo(() => unitOfWork.Movimientos.GetAll()).Returns(Task.FromResult(fakeClients));
-            var controller = new ClientesController(unitOfWork);
+            var controller = new ClientesController(unitOfWork, automapper);
 
             //Act
             var actionResult = await controller.Get();
@@ -37,7 +40,9 @@ namespace TechnicalTestMicroserviceASPCore.Tests
             var fakeClients = A.CollectionOfDummy<Movimiento>(count).AsEnumerable();
             var unitOfWork = A.Fake<IUnitOfWork>();
             A.CallTo(() => unitOfWork.Movimientos.GetAll()).Returns(Task.FromResult(fakeClients));
-            var controller = new ClientesController(unitOfWork);
+            var automapper = A.Fake<IMapper>();
+
+            var controller = new ClientesController(unitOfWork, automapper);
 
             //Act
             var actionResult = await controller.Get();

@@ -1,3 +1,4 @@
+using AutoMapper;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using TechnicalTestMicroserviceASPCore.Controllers;
@@ -6,17 +7,19 @@ using TechnicalTestMicroserviceASPCore.UnitOfWork;
 
 namespace TechnicalTestMicroserviceASPCore.Tests
 {
-    public class ClienteControllerTests
+    public class CuentaControllerTests
     {
         [Fact]
-        public async void Get_Returns_Ok_Response_List_of_clients_When_Data_Exist()
+        public async void Get_Returns_Ok_Response_List_of_cuentas_When_Data_Exist()
         {
             //Arrange
             int count = 5;
-            var fakeClients = A.CollectionOfDummy<Cliente>(count).AsEnumerable();
+            var fakeClients = A.CollectionOfDummy<Cuenta>(count).AsEnumerable();
             var unitOfWork = A.Fake<IUnitOfWork>();
-            A.CallTo(() => unitOfWork.Clientes.GetAll()).Returns(Task.FromResult(fakeClients));
-            var controller = new ClientesController(unitOfWork);
+            var automapper = A.Fake<IMapper>();
+
+            A.CallTo(() => unitOfWork.Cuentas.GetAll()).Returns(Task.FromResult(fakeClients));
+            var controller = new ClientesController(unitOfWork, automapper);
 
             //Act
             var actionResult = await controller.Get();
@@ -34,10 +37,12 @@ namespace TechnicalTestMicroserviceASPCore.Tests
         {
             //Arrange
             int count = 0;
-            var fakeClients = A.CollectionOfDummy<Cliente>(count).AsEnumerable();
+            var fakeClients = A.CollectionOfDummy<Cuenta>(count).AsEnumerable();
             var unitOfWork = A.Fake<IUnitOfWork>();
-            A.CallTo(() => unitOfWork.Clientes.GetAll()).Returns(Task.FromResult(fakeClients));
-            var controller = new ClientesController(unitOfWork);
+            var automapper = A.Fake<IMapper>();
+
+            A.CallTo(() => unitOfWork.Cuentas.GetAll()).Returns(Task.FromResult(fakeClients));
+            var controller = new ClientesController(unitOfWork, automapper);
 
             //Act
             var actionResult = await controller.Get();

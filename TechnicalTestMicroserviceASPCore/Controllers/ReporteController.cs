@@ -31,8 +31,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 fechaFin = fechaFin.AddHours(23).AddMinutes(59).AddSeconds(59);
 
             var movimientos = await _context.Movimiento
-                              .Include(c => c.Cuenta)
-                              .Include(c => c.Cuenta.Cliente)
+                              .Include(c => c.Cuenta.Cliente.Nombre)
                               .Where(c => c.Cuenta.Cliente.Identificacion == clienteIdentificacion
                                             && c.Fecha >= fechaInicio
                                              && c.Fecha <= fechaFin)
