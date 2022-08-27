@@ -108,12 +108,9 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                 return BadRequest("No se ha definido limite diario en el sistema");
             }
 
+            var sumaRetirosHoy = await _unitOfWork.Movimientos.FindTodaysBalanceUsed(cuenta.Id);
 
-
-            var sumaSaldosCuentaHoy = await _unitOfWork.Movimientos.FindTodaysBalanceUsed(cuenta.Id);
-
-
-            if (sumaSaldosCuentaHoy >= LimiteDiario)
+            if ((LimiteDiario - sumaRetirosHoy) <= 0)
             {
                 return BadRequest("Cupo diario Excedido");
             }

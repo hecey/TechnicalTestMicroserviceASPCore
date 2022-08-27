@@ -16,10 +16,11 @@ namespace TechnicalTestMicroserviceASPCore.Repositories
         {
             var todaysDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day);
 
+            var sumWithdrawns = await DataContext.Movimiento
+            .Where(x => x.CuentaId == cuentaId && x.Fecha.Date == todaysDate.Date
+                && x.Valor < 0).SumAsync(x => x.Saldo);
 
-            return await DataContext.Movimiento
-            .Where(x => x.CuentaId == cuentaId && x.Fecha.Date == todaysDate.Date)
-            .SumAsync(x => x.Saldo);
+            return sumWithdrawns;
 
         }
 
