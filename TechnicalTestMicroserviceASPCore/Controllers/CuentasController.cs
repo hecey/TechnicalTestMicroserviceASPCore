@@ -25,7 +25,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         {
             var cuentas = await _unitOfWork.Cuentas.GetAll();
             var cuentasDto = _mapper.Map<IEnumerable<CuentaDto>>(cuentas);
-            return Ok(cuentasDto);
+            return cuentasDto.Any() ? Ok(cuentasDto) : NoContent();
 
         }
 

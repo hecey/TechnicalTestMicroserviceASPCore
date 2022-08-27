@@ -29,11 +29,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             {
                 var clientes = (List<Cliente>)await _unitOfWork.Clientes.GetAll();
                 var clientesDto = _mapper.Map<IEnumerable<ClienteDto>>(clientes);
-                return clientesDto is not null ? Ok(clientesDto) : NoContent();
+                return clientesDto.Any() ? Ok(clientesDto) : NoContent();
             }
             catch (Exception ex)
             {
-                //_logger.LogError($"Something went wrong: {ex}");
                 return StatusCode(500, "Internal server error: " + ex);
             }
 

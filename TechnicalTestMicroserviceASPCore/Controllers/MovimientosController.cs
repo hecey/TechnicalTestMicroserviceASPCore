@@ -29,7 +29,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             var movimientos = await _unitOfWork.Movimientos.GetAll();
             var movimientosDto = _mapper.Map<IEnumerable<MovimientoDto>>(movimientos);
 
-            return Ok(movimientosDto);
+            return movimientosDto.Any() ? Ok(movimientosDto) : NoContent();
 
         }
 
