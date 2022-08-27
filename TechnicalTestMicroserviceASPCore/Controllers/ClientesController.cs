@@ -57,20 +57,17 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         [HttpPost]
         public async Task<ActionResult<List<ClienteDto>>> Addcliente(ClienteDto clienteDto)
         {
-            if (clienteDto is null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("No cliente to add");
+                return BadRequest(ModelState);
             }
+
 
             if (clienteDto.Identificacion is null)
             {
                 return BadRequest("No hay identificacion de cliente to add");
             }
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Invalid model object");
-            }
 
             var cliente = await _unitOfWork.Clientes.Find(x => x.Identificacion == clienteDto.Identificacion);
 
@@ -106,9 +103,9 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
         [HttpPut]
         public async Task<ActionResult<ClienteDto>> Updatecliente(ClienteDto clienteDtoUpdate)
         {
-            if (clienteDtoUpdate == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound("No cliente to add");
+                return BadRequest(ModelState);
             }
 
             if (clienteDtoUpdate.Identificacion == null)
@@ -143,14 +140,20 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             return Ok(clienteDto);
         }
         [HttpDelete]
-        public async Task<ActionResult<List<ClienteDto>>> Removecliente(Cliente cliente)
+        public async Task<ActionResult<List<ClienteDto>>> Removecliente(ClienteDto clienteDto)
         {
-            if (cliente.Identificacion is null)
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (clienteDto.Identificacion is null)
             {
                 return BadRequest("No hay identificacion de cliente");
             }
 
-            var clientedb = await _unitOfWork.Clientes.Find(x => x.Identificacion == cliente.Identificacion);
+            var clientedb = await _unitOfWork.Clientes.Find(x => x.Identificacion == clienteDto.Identificacion);
 
 
             if (clientedb is null)
