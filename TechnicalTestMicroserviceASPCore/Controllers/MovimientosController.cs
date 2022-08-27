@@ -83,12 +83,10 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             decimal saldoDisponible = 0;
             decimal saldoAnterior = 0;
 
-            var ultimoMovimientoCliente = await _unitOfWork.Movimientos
-                .FindAll(filter: x => x.CuentaId == cuenta.Id, orderBy: q => q.OrderBy(d => d.Fecha));
+            var ultimoMovimiento = await _unitOfWork.Movimientos.LastTransactionByAccount(cuenta.Id);
 
-
-            saldoAnterior = ultimoMovimientoCliente is not null ?
-                              ultimoMovimientoCliente.First().Saldo :
+            saldoAnterior = ultimoMovimiento is not null ?
+                              ultimoMovimiento.Saldo :
                               cuenta.SaldoInicial;
 
             if (movimientoDto.Valor < 0)

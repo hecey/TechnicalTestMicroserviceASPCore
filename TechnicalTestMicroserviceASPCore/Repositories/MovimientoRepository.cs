@@ -30,8 +30,17 @@ namespace TechnicalTestMicroserviceASPCore.Repositories
                               .Where(c => c.Cuenta.Cliente.Identificacion == clienteIdentificacion
                                             && c.Fecha >= startDate
                                              && c.Fecha <= endDate)
-                              .ToListAsync(); ;
+                              .ToListAsync();
         }
+
+
+        public async Task<Movimiento?> LastTransactionByAccount(int cuentaId)
+        {
+            return await DataContext.Movimiento
+                              .Where(c => c.CuentaId == cuentaId)
+                              .OrderByDescending(x => x.Fecha).FirstOrDefaultAsync();
+        }
+
         public DataContext DataContext
         {
             get { return (DataContext)Context; }
