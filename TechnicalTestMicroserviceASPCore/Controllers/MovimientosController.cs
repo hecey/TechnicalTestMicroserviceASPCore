@@ -77,7 +77,6 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             // Los valores cuando son crédito son positivos, y los débitos son negativos.
             // Debe almacenarse el saldo disponible en cada transacción dependiendo del
             // tipo de movimiento.
-            movimientoDto.TipoDeMovimiento = movimientoDto.Valor > 0 ? "credito" : "debito";
 
             // Si el saldo es menor a la transacción débito, debe desplegar mensaje
             // “Saldo no disponible”
@@ -92,20 +91,15 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
                               ultimoMovimientoCliente.First().Saldo :
                               cuenta.SaldoInicial;
 
-            if (movimientoDto.TipoDeMovimiento.Equals("debito"))
+            if (movimientoDto.Valor < 0)
             {
-
                 if (saldoAnterior + movimientoDto.Valor < 0)
                 {
                     return BadRequest("Saldo no disponible");
                 }
-
-
             }
 
-
             saldoDisponible = saldoAnterior + movimientoDto.Valor;
-
 
             // Se debe tener un parámetro de limite diario de retiro (valor tope 1000$)
 
@@ -128,17 +122,15 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
 
             //Guardar 
 
-            var MovimientoNueva = new Movimiento
+            var MovimientoNew = new Movimiento
             {
-                Fecha = DateTime.Now,
-                TipoDeMovimiento = movimientoDto.TipoDeMovimiento,
                 Valor = movimientoDto.Valor,
                 Saldo = saldoDisponible,
                 CuentaId = cuenta.Id,
                 Cuenta = cuenta
             };
 
-            _unitOfWork.Movimientos.Add(MovimientoNueva);
+            _unitOfWork.Movimientos.Add(MovimientoNew);
             var movimientos = await _unitOfWork.Complete();
             var movimientosDto = _mapper.Map<IEnumerable<MovimientoDto>>(movimientos);
 
@@ -160,8 +152,6 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
             }
             var movimientodb = movimiento;
 
-            movimientodb.Fecha = DateTime.Now;
-            movimientodb.TipoDeMovimiento = movimientoDtoUpdate.TipoDeMovimiento;
             movimientodb.Valor = movimientoDtoUpdate.Valor;
             movimientodb.Saldo = movimientoDtoUpdate.Saldo;
             movimientodb.CuentaId = movimientoDtoUpdate.CuentaId;

@@ -5,8 +5,11 @@ namespace TechnicalTestMicroserviceASPCore.Models
     public class Movimiento
     {
         public int Id { get; set; }
-        public DateTime Fecha { get; set; }
-        public string? TipoDeMovimiento { get; set; }
+        public DateTime Fecha { get; set; } = DateTime.Now;
+        public string TipoDeMovimiento
+        {
+            get { return Valor > 0 ? "Credito" : "Debito"; }
+        }
 
         public decimal Valor { get; set; } = 0;
         public decimal Saldo { get; set; } = 0;
