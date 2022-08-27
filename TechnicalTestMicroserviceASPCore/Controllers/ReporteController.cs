@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TechnicalTestMicroserviceASPCore.Data;
 using TechnicalTestMicroserviceASPCore.DTOs;
+using TechnicalTestMicroserviceASPCore.UnitOfWork;
 
 namespace TechnicalTestMicroserviceASPCore.Controllers
 {
@@ -9,34 +8,25 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
     [Route("api/[controller]")]
     public class ReporteController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-
-
-        public ReporteController(DataContext context)
+        public ReporteController(IUnitOfWork unitOfWork)
         {
-            _context = context;
-
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<ReporteDto>>> Get(DateTime fechaInicio, DateTime fechaFin, string clienteIdentificacion)
         {
 
-            var clientedb = await _context.Cliente.Where(x => x.Identificacion == clienteIdentificacion).FirstOrDefaultAsync();
+            var clientedb = await _unitOfWork.Clientes.Find(x => x.Identificacion == clienteIdentificacion);
 
             if (clientedb == null) return BadRequest("Cliente not found");
 
             if (fechaInicio == fechaFin)
                 fechaFin = fechaFin.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-            var movimientos = await _context.Movimiento
-                              .Include(c => c.Cuenta.Cliente.Nombre)
-                              .Where(c => c.Cuenta.Cliente.Identificacion == clienteIdentificacion
-                                            && c.Fecha >= fechaInicio
-                                             && c.Fecha <= fechaFin)
-                              .ToListAsync();
-
+            var movimientos = await _unitOfWork.Movimientos.ReportByIDRangeDate(clienteIdentificacion, fechaInicio, fechaFin);
 
             List<ReporteDto> reporte = new List<ReporteDto>();
 

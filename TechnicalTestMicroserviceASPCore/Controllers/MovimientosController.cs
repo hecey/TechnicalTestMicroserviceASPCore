@@ -112,7 +112,7 @@ namespace TechnicalTestMicroserviceASPCore.Controllers
 
 
 
-            var sumaSaldosCuentaHoy = await _unitOfWork.Movimientos.FindDailyBalanceUsed(cuenta.Id);
+            var sumaSaldosCuentaHoy = await _unitOfWork.Movimientos.FindTodaysBalanceUsed(cuenta.Id);
 
 
             if (sumaSaldosCuentaHoy >= LimiteDiario)

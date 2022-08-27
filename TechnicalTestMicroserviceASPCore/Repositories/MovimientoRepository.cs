@@ -9,17 +9,32 @@ namespace TechnicalTestMicroserviceASPCore.Repositories
 
         public MovimientoRepository(DataContext context) : base(context)
         {
+        }
+
+
+        public async Task<decimal> FindTodaysBalanceUsed(int cuentaId)
+        {
+            var todaysDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day);
+
+
+            return await DataContext.Movimiento
+            .Where(x => x.CuentaId == cuentaId && x.Fecha.Date == todaysDate.Date)
+            .SumAsync(x => x.Saldo);
 
         }
 
-        public async Task<decimal> FindDailyBalanceUsed(int cuentaId)
+        public async Task<IEnumerable<Movimiento>> ReportByIDRangeDate(string clienteIdentificacion, DateTime startDate, DateTime endDate)
         {
-            var todaysDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day);
-            var sumaSaldosporFecha = await Context.Movimiento
-                .Where(x => x.CuentaId == cuentaId && x.Fecha.Date == todaysDate.Date)
-                .SumAsync(x => x.Saldo);
-
-            return sumaSaldosporFecha;
+            return await DataContext.Movimiento
+                              .Include(c => c.Cuenta.Cliente.Nombre)
+                              .Where(c => c.Cuenta.Cliente.Identificacion == clienteIdentificacion
+                                            && c.Fecha >= startDate
+                                             && c.Fecha <= endDate)
+                              .ToListAsync(); ;
+        }
+        public DataContext DataContext
+        {
+            get { return (DataContext)Context; }
         }
     }
 }

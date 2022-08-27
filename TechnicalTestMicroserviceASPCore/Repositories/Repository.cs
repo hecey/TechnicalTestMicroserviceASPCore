@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TechnicalTestMicroserviceASPCore.Data;
 
 namespace TechnicalTestMicroserviceASPCore.Repositories
 {
 
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected readonly DataContext Context;
+        protected readonly DbContext Context;
 
-        public Repository(DataContext context)
+        public Repository(DbContext context)
         {
             Context = context;
         }
