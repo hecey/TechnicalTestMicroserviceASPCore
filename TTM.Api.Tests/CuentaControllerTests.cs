@@ -12,7 +12,7 @@ namespace TTM.Api.Tests
     public class CuentaControllerTests
     {
         private static IMapper? _mapper;
-        public CuentaControllerTests()
+        public CuentaControllerTests(IMapper mapper)
         {
             if (_mapper == null)
             {
@@ -21,9 +21,9 @@ namespace TTM.Api.Tests
                     mc.AddProfile(new CuentaDtoProfile());
                 });
 
-                IMapper mapper = mappingConfig.CreateMapper();
-                _mapper = mapper;
+                 mapper = mappingConfig.CreateMapper();
             }
+            _mapper = mapper;
 
         }
 
@@ -37,7 +37,7 @@ namespace TTM.Api.Tests
 
 
             A.CallTo(() => unitOfWork.Cuentas.GetAll()).Returns(Task.FromResult(fakeClients));
-            var controller = new CuentasController(unitOfWork, _mapper);
+            var controller = new CuentasController(unitOfWork, _mapper!);
 
             //Act
             var actionResult = await controller.Get();
@@ -46,8 +46,6 @@ namespace TTM.Api.Tests
             var result = actionResult.Result as OkObjectResult;
             var returnClientes = result != null ? result.Value as IEnumerable<CuentaDto> : null;
             Assert.Equal(count, returnClientes is not null ? returnClientes.Count() : 0);
-
-
         }
 
         [Fact]
@@ -58,9 +56,8 @@ namespace TTM.Api.Tests
             var fakeClients = A.CollectionOfDummy<Cuenta>(count).AsEnumerable();
             var unitOfWork = A.Fake<IUnitOfWork>();
 
-
             A.CallTo(() => unitOfWork.Cuentas.GetAll()).Returns(Task.FromResult(fakeClients));
-            var controller = new CuentasController(unitOfWork, _mapper);
+            var controller = new CuentasController(unitOfWork, _mapper!);
 
             //Act
             var actionResult = await controller.Get();
@@ -68,8 +65,6 @@ namespace TTM.Api.Tests
             //Assert
             var result = actionResult.Result;
             Assert.IsType<NoContentResult>(result);
-
-
         }
     }
 }

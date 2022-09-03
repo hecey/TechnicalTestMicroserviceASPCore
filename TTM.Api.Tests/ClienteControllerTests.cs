@@ -41,7 +41,7 @@ namespace TTM.Api.Tests
 
             A.CallTo(() => unitOfWork.Clientes.GetAll()).Returns(Task.FromResult(fakeClients));
 
-            var controller = new ClientesController(unitOfWork, _mapper);
+            var controller = new ClientesController(unitOfWork, _mapper!);
 
             //Act
             var actionResult = await controller.Get();
@@ -63,7 +63,7 @@ namespace TTM.Api.Tests
             var unitOfWork = A.Fake<IUnitOfWork>();
 
             A.CallTo(() => unitOfWork.Clientes.GetAll()).Returns(Task.FromResult(fakeClients));
-            var controller = new ClientesController(unitOfWork, _mapper);
+            var controller = new ClientesController(unitOfWork, _mapper!);
 
             //Act
             var actionResult = await controller.Get();
