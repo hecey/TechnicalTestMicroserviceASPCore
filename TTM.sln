@@ -5,7 +5,11 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TTM.Api", "TTM.Api\TTM.Api.csproj", "{8D89D2FF-8EFC-4859-BD57-60420BB17726}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTM.Api.Tests", "TTM.Api.Tests\TTM.Api.Tests.csproj", "{CBE79E6A-C929-445F-B12B-DBFDEA4F9E1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TTM.Api.Tests", "TTM.Api.Tests\TTM.Api.Tests.csproj", "{CBE79E6A-C929-445F-B12B-DBFDEA4F9E1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TTM.Common", "TTM.Common\TTM.Common.csproj", "{5C3D8046-6BE3-412D-A6E7-D28A6747E421}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTM.ClientService", "TTM.ClientService\TTM.ClientService.csproj", "{5F803376-0A63-4A9A-A825-8A28726FE8BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{CBE79E6A-C929-445F-B12B-DBFDEA4F9E1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBE79E6A-C929-445F-B12B-DBFDEA4F9E1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBE79E6A-C929-445F-B12B-DBFDEA4F9E1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C3D8046-6BE3-412D-A6E7-D28A6747E421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3D8046-6BE3-412D-A6E7-D28A6747E421}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C3D8046-6BE3-412D-A6E7-D28A6747E421}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C3D8046-6BE3-412D-A6E7-D28A6747E421}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F803376-0A63-4A9A-A825-8A28726FE8BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F803376-0A63-4A9A-A825-8A28726FE8BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F803376-0A63-4A9A-A825-8A28726FE8BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F803376-0A63-4A9A-A825-8A28726FE8BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
