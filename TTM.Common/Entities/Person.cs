@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TTM.Common.Interfaces;
 
 namespace TTM.Common.Entities
 {

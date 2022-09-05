@@ -1,4 +1,4 @@
-namespace TTM.Common.Interfaces
+namespace TTM.Common.Entities
 {
     public interface IEntity
     {
