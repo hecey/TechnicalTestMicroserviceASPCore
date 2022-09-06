@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using TransactionService.DTOs;
 using Common.Entities;
+using Microsoft.AspNetCore.Mvc;
 using TransactionService.Clients;
+using TransactionService.DTOs;
 using TransactionService.Repositories;
 
 namespace TransactionService.Controllers
@@ -16,7 +16,7 @@ namespace TransactionService.Controllers
         private readonly TransactionRepository<Transaction> _repository;
         private readonly IMapper _mapper;
 
-        public TransactionsController(TransactionRepository<Transaction> repository, IConfiguration configRoot, IMapper mapper,RemoteAccountService remoteAccountService)
+        public TransactionsController(TransactionRepository<Transaction> repository, IConfiguration configRoot, IMapper mapper, RemoteAccountService remoteAccountService)
         {
             _repository = repository;
             _configRoot = (IConfigurationRoot)configRoot;
@@ -61,9 +61,9 @@ namespace TransactionService.Controllers
                 return BadRequest("Already in database");
             }
 
-            var account = await _remoteAccountService.GetAccountByIdAsync(transactionDto.AccountId);
+            var accountDto = await _remoteAccountService.GetAccountByIdAsync(transactionDto.AccountNumber!);
 
-            if (account == null)
+            if (accountDto == null)
             {
                 return BadRequest("Account not found in database");
             }
@@ -82,11 +82,11 @@ namespace TransactionService.Controllers
             decimal balanceAvailable = 0;
             decimal lastBalance = 0;
 
-            var lastTransaction = await _repository.LastTransactionByAccount(account.Id);
+            var lastTransaction = await _repository.LastTransactionByAccount(accountDto.Id);
 
             lastBalance = lastTransaction is not null ?
                               lastTransaction.Amount :
-                              account.InitialBalance;
+                              accountDto.InitialBalance;
 
             if (transactionDto.Amount < 0)
             {
@@ -102,12 +102,12 @@ namespace TransactionService.Controllers
 
             var dailyLimitForWithdrawn = _configRoot.GetValue<decimal>("dailyLimitForWithdrawn");
 
-            if (dailyLimitForWithdrawn < 0)
+            if (dailyLimitForWithdrawn <= 0)
             {
                 return BadRequest("No se ha definido limite diario en el sistema");
             }
 
-            var amountOfTodayWithdrawn = await _repository.FindTodaysBalanceUsed(account.Id);
+            var amountOfTodayWithdrawn = await _repository.FindTodaysBalanceUsed(accountDto.Id);
 
             if ((dailyLimitForWithdrawn - amountOfTodayWithdrawn) <= 0)
             {
@@ -115,12 +115,14 @@ namespace TransactionService.Controllers
             }
 
             //Save
+            var account = _mapper.Map<Account>(accountDto);
 
             var newTransaction = new Transaction
             {
                 Amount = transactionDto.Amount,
                 Balance = balanceAvailable,
-                AccountId = account.Id,
+                AccountId = accountDto.Id,
+                Account = account
             };
 
             _repository.Add(newTransaction);

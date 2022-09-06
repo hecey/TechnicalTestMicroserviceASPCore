@@ -7,18 +7,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers(options =>
-{
-    options.SuppressAsyncSuffixInActionNames = false;
-});
-// Add services to the container.
+builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 builder.Services.AddDbContext<DataContext>(o => o.UseInMemoryDatabase("AccountDB"));
-builder.Services.AddHttpClient<RemoteClientService>(client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7149/api");
-});
-
+builder.Services.AddHttpClient<RemoteClientService>(client => client.BaseAddress = new Uri("https://localhost:7149/api"));
 builder.Services.AddScoped<AccountRepository<Account>, AccountRepository<Account>>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

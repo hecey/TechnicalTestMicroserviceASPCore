@@ -2,7 +2,7 @@
 using AutoMapper;
 using Common.Entities;
 
-namespace TTM.Api.Profiles
+namespace AccountService.Profiles
 {
     public class AccountDtoProfile : Profile
     {

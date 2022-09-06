@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "TTM.Api.Tests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:7208;http://localhost:7209"
+    }
+  }
+}

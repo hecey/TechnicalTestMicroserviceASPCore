@@ -1,6 +1,6 @@
-﻿using TransactionService.DTOs;
-using AutoMapper;
+﻿using AutoMapper;
 using Common.Entities;
+using TransactionService.DTOs;
 
 namespace TransactionService.Profiles
 {
@@ -10,6 +10,7 @@ namespace TransactionService.Profiles
         {
             //Source => Dest
             CreateMap<Transaction, TransactionDto>();
+            CreateMap<AccountDto, Account>();
         }
     }
 }

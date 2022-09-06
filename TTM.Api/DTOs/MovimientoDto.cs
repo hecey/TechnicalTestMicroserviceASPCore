@@ -11,6 +11,5 @@
         public int CuentaId { get; set; }
 
         public string? NumeroDeCuenta { get; set; }
-
     }
 }

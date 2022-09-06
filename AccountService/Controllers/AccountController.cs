@@ -28,14 +28,12 @@ namespace AccountService.Controllers
             var Accounts = await _repository.GetAll();
             var AccountsDto = _mapper.Map<IEnumerable<AccountDto>>(Accounts);
             return AccountsDto.Any() ? Ok(AccountsDto) : NoContent();
-
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AccountDto>> FindAccount(Guid id)
+        public async Task<ActionResult<AccountDto>> FindAccount(String id)
         {
-
-            var Account = await _repository.Get(id);
+            var Account = await _repository.Find(x => x.Number == id);
             if (Account == null)
             {
                 return BadRequest("Account not found");
@@ -43,7 +41,6 @@ namespace AccountService.Controllers
             var AccountDto = _mapper.Map<AccountDto>(Account);
 
             return Ok(AccountDto);
-
         }
 
         [HttpPost]

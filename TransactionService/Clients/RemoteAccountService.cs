@@ -11,9 +11,9 @@ namespace TransactionService.Clients
             this.httpClient = httpClient;
         }
 
-        public async Task<AccountDto> GetAccountByIdAsync(Guid AccountId)
+        public async Task<AccountDto> GetAccountByIdAsync(String accountNumber)
         {
-            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Accounts/{AccountId}");
+            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Account/{accountNumber}");
             if (res.IsSuccessStatusCode)
             {
                 var client = await res.Content.ReadFromJsonAsync<AccountDto>();
