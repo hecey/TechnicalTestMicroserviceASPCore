@@ -12,7 +12,7 @@ namespace TTM.Api.Tests
     public class CuentaControllerTests
     {
         private static IMapper? _mapper;
-        public CuentaControllerTests(IMapper mapper)
+        public CuentaControllerTests()
         {
             if (_mapper == null)
             {
@@ -21,10 +21,8 @@ namespace TTM.Api.Tests
                     mc.AddProfile(new CuentaDtoProfile());
                 });
 
-                 mapper = mappingConfig.CreateMapper();
+                _mapper = mappingConfig.CreateMapper();
             }
-            _mapper = mapper;
-
         }
 
         [Fact]

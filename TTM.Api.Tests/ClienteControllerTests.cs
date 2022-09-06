@@ -13,7 +13,7 @@ namespace TTM.Api.Tests
     {
         private static IMapper? _mapper;
 
-        public ClienteControllerTests(IMapper mapper)
+        public ClienteControllerTests()
         {
             if (_mapper == null)
             {
@@ -22,10 +22,8 @@ namespace TTM.Api.Tests
                     mc.AddProfile(new ClienteDtoProfile());
                 });
 
-                 mapper = mappingConfig.CreateMapper();
-                _mapper = mapper;
-            }else{
-                _mapper =mapper;
+                _mapper = mappingConfig.CreateMapper();
+
             }
 
         }

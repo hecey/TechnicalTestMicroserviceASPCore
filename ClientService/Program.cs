@@ -1,6 +1,7 @@
 using ClientService.Data;
 using ClientService.Repositories;
 using Common.Entities;
+using Common.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +12,7 @@ builder.Services.AddControllers(options =>
 });
 // Add services to the container.
 builder.Services.AddDbContext<DataContext>(o => o.UseInMemoryDatabase("ClientsDB"));
-builder.Services.AddScoped<ClientRepository<Client>, ClientRepository<Client>>();
+builder.Services.AddScoped<IClientRepository<Client>, ClientRepository<Client>>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 

@@ -14,7 +14,7 @@ namespace AccountService.Clients
 
         public async Task<ClientDto> GetClientByIdAsync(Guid ClientId)
         {
-            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Clients/{ClientId}");
+            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Client/{ClientId}");
             if (res.IsSuccessStatusCode)
             {
                 var client = await res.Content.ReadFromJsonAsync<ClientDto>();

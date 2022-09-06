@@ -1,8 +1,8 @@
 ﻿using AccountService.Clients;
 using AccountService.DTOs;
-using AccountService.Repositories;
 using AutoMapper;
 using Common.Entities;
+using Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Controllers
@@ -12,11 +12,11 @@ namespace AccountService.Controllers
     public class AccountController : Controller
     {
         private readonly RemoteClientService _remoteClientService;
-        private readonly AccountRepository<Account> _repository;
+        private readonly IAccountRepository<Account> _repository;
         private readonly IMapper _mapper;
-        public AccountController(AccountRepository<Account> unitOfWork, IMapper mapper, RemoteClientService remoteClientService)
+        public AccountController(IAccountRepository<Account> repository, IMapper mapper, RemoteClientService remoteClientService)
         {
-            _repository = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
             _remoteClientService = remoteClientService;
 

@@ -1,20 +1,20 @@
 ﻿using AutoMapper;
 using ClientService.DTOs;
-using ClientService.Repositories;
 using Common.Entities;
+using Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ClientsController : ControllerBase
+    public class ClientController : ControllerBase
     {
-        private readonly ClientRepository<Client> _repository;
+        private readonly IClientRepository<Client> _repository;
         private readonly IMapper _mapper;
-        public ClientsController(ClientRepository<Client> unitOfWork, IMapper mapper)
+        public ClientController(IClientRepository<Client> repository, IMapper mapper)
         {
-            _repository = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
         }
 

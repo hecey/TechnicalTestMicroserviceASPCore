@@ -1,22 +1,22 @@
 ﻿using AutoMapper;
 using Common.Entities;
+using Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using TransactionService.Clients;
 using TransactionService.DTOs;
-using TransactionService.Repositories;
 
 namespace TransactionService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TransactionsController : Controller
+    public class TransactionController : Controller
     {
         private readonly RemoteAccountService _remoteAccountService;
         private readonly IConfiguration _configRoot;
-        private readonly TransactionRepository<Transaction> _repository;
+        private readonly ITransactionRepository<Transaction> _repository;
         private readonly IMapper _mapper;
 
-        public TransactionsController(TransactionRepository<Transaction> repository, IConfiguration configRoot, IMapper mapper, RemoteAccountService remoteAccountService)
+        public TransactionController(ITransactionRepository<Transaction> repository, IConfiguration configRoot, IMapper mapper, RemoteAccountService remoteAccountService)
         {
             _repository = repository;
             _configRoot = (IConfigurationRoot)configRoot;
