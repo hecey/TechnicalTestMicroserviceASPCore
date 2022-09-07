@@ -21,24 +21,18 @@ namespace ClientService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ClientDto>>> GetAsync()
         {
-            try
-            {
-                var clients = (List<Client>)await _repository.GetAll();
-                var clientsDto = _mapper.Map<IEnumerable<ClientDto>>(clients);
-                return clientsDto.Any() ? Ok(clientsDto) : NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex);
-            }
+
+            var clients = (List<Client>)await _repository.GetAsync();
+            var clientsDto = _mapper.Map<IEnumerable<ClientDto>>(clients);
+            return clientsDto.Any() ? Ok(clientsDto) : NoContent();
 
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ClientDto>> FindAsync(Guid id)
+        public async Task<ActionResult<ClientDto>> GetByIdAsync(Guid id)
         {
 
-            var client = await _repository.Get(id);
+            var client = await _repository.GetAsync(id);
             if (client == null)
             {
                 return NotFound("client not found");
@@ -50,7 +44,7 @@ namespace ClientService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<ClientDto>>> AddAsync(ClientDto clientDto)
+        public async Task<ActionResult<List<ClientDto>>> PostAsync(CreateClientDto createClientDto)
         {
             if (!ModelState.IsValid)
             {
@@ -58,13 +52,13 @@ namespace ClientService.Controllers
             }
 
 
-            if (clientDto.Identification is null)
+            if (createClientDto.Identification is null)
             {
                 return BadRequest("No hay identification de client to add");
             }
 
 
-            var client = await _repository.Find(x => x.Identification == clientDto.Identification);
+            var client = await _repository.FindAsync(x => x.Identification == createClientDto.Identification);
 
 
             if (client is not null)
@@ -75,40 +69,39 @@ namespace ClientService.Controllers
 
             var newClient = new Client
             {
-                Id = clientDto.Id,
-                Name = clientDto.Name,
-                Genre = clientDto.Genre,
-                Age = clientDto.Age,
-                Identification = clientDto.Identification,
-                Address = clientDto.Address,
-                Phone = clientDto.Phone,
-                Password = clientDto.Password,
-                Status = clientDto.Status
+                Id = Guid.NewGuid(),
+                Name = createClientDto.Name,
+                Genre = createClientDto.Genre,
+                Age = createClientDto.Age,
+                Identification = createClientDto.Identification,
+                Address = createClientDto.Address,
+                Phone = createClientDto.Phone,
+                Password = createClientDto.Password,
+                Status = createClientDto.Status
             };
 
-            _repository.Add(newClient);
-            await _repository.Save();
+            _repository.AddAsync(newClient);
+            await _repository.SaveAsync();
 
-            var clients = await _repository.GetAll();
-            var clientsDto = _mapper.Map<IEnumerable<ClientDto>>(clients);
+            var clientDto = _mapper.Map<ClientDto>(newClient);
 
-            return Ok(clientsDto);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = newClient.Id }, clientDto);
         }
 
         [HttpPut]
-        public async Task<ActionResult<ClientDto>> UpdateAsync(ClientDto clientDtoUpdate)
+        public async Task<ActionResult<ClientDto>> PutAsync(UpdateClientDto updateClientDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (clientDtoUpdate.Identification == null)
+            if (updateClientDto.Identification == null)
             {
                 return BadRequest("No hay identification de client");
             }
 
-            var clientDB = await _repository.Find(x => x.Identification == clientDtoUpdate.Identification);
+            var clientDB = await _repository.FindAsync(x => x.Identification == updateClientDto.Identification);
 
 
             if (clientDB is null)
@@ -117,25 +110,23 @@ namespace ClientService.Controllers
             }
 
 
+            clientDB.Name = updateClientDto.Name;
+            clientDB.Genre = updateClientDto.Genre;
+            clientDB.Age = updateClientDto.Age;
+            clientDB.Identification = updateClientDto.Identification;
+            clientDB.Address = updateClientDto.Address;
+            clientDB.Phone = updateClientDto.Name;
+            clientDB.Password = updateClientDto.Password;
+            clientDB.Status = updateClientDto.Status;
 
-            clientDB.Id = clientDtoUpdate.Id;
-            clientDB.Name = clientDtoUpdate.Name;
-            clientDB.Genre = clientDtoUpdate.Genre;
-            clientDB.Age = clientDtoUpdate.Age;
-            clientDB.Identification = clientDtoUpdate.Identification;
-            clientDB.Address = clientDtoUpdate.Address;
-            clientDB.Phone = clientDtoUpdate.Name;
-            clientDB.Password = clientDtoUpdate.Password;
-            clientDB.Status = clientDtoUpdate.Status;
-
-            _repository.Update(clientDB);
-            await _repository.Save();
+            _repository.UpdateAsync(clientDB);
+            await _repository.SaveAsync();
 
             var clientDto = _mapper.Map<ClientDto>(clientDB);
             return Ok(clientDto);
         }
         [HttpDelete]
-        public async Task<ActionResult<List<ClientDto>>> RemoveAsync(ClientDto clientDto)
+        public async Task<ActionResult<List<ClientDto>>> DeletAsync(ClientDto clientDto)
         {
 
             if (!ModelState.IsValid)
@@ -148,7 +139,7 @@ namespace ClientService.Controllers
                 return BadRequest("No hay identification de client");
             }
 
-            var clientDB = await _repository.Find(x => x.Identification == clientDto.Identification);
+            var clientDB = await _repository.FindAsync(x => x.Identification == clientDto.Identification);
 
 
             if (clientDB is null)
@@ -158,13 +149,10 @@ namespace ClientService.Controllers
 
 
 
-            _repository.Delete(clientDB.Id);
-            await _repository.Save();
+            _repository.DeleteAsync(clientDB.Id);
+            await _repository.SaveAsync();
 
-            var clients = await _repository.GetAll();
-            var clientsDto = _mapper.Map<IEnumerable<ClientDto>>(clients);
-
-            return Ok(clientsDto);
+            return Ok(clientDB);
         }
     }
 }

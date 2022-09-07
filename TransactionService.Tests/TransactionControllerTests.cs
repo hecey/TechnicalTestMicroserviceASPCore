@@ -45,11 +45,11 @@ namespace TransactionService.Tests
             var remoteAccountService = A.Fake<RemoteAccountService>();
 
 
-            A.CallTo(() => _repsitory.GetAll()).Returns(Task.FromResult(fakeClients));
+            A.CallTo(() => _repsitory.GetAsync()).Returns(Task.FromResult(fakeClients));
             var controller = new TransactionController(_repsitory, _configRoot!, _mapper!, remoteAccountService);
 
             //Act
-            var actionResult = await controller.Get();
+            var actionResult = await controller.GetAsync();
 
             //Assert
             var result = actionResult.Result as OkObjectResult;
@@ -67,13 +67,13 @@ namespace TransactionService.Tests
             var fakeClients = A.CollectionOfDummy<Transaction>(count).AsEnumerable();
             var _repsitory = A.Fake<ITransactionRepository<Transaction>>();
             var remoteAccountService = A.Fake<RemoteAccountService>();
-            A.CallTo(() => _repsitory.GetAll()).Returns(Task.FromResult(fakeClients));
+            A.CallTo(() => _repsitory.GetAsync()).Returns(Task.FromResult(fakeClients));
 
 
             var controller = new TransactionController(_repsitory, _configRoot!, _mapper!, remoteAccountService);
 
             //Act
-            var actionResult = await controller.Get();
+            var actionResult = await controller.GetAsync();
 
             //Assert
             var result = actionResult.Result;

@@ -37,7 +37,7 @@ namespace ClientService.Tests
             var repository = A.Fake<IClientRepository<Client>>();
 
 
-            A.CallTo(() => repository.GetAll()).Returns(Task.FromResult(fakeClients));
+            A.CallTo(() => repository.GetAsync()).Returns(Task.FromResult(fakeClients));
 
             ClientController controller = new ClientController(repository, _mapper!);
 
@@ -60,7 +60,7 @@ namespace ClientService.Tests
             var fakeClients = A.CollectionOfDummy<Client>(count).AsEnumerable();
             var repository = A.Fake<IClientRepository<Client>>();
 
-            A.CallTo(() => repository.GetAll()).Returns(Task.FromResult(fakeClients));
+            A.CallTo(() => repository.GetAsync()).Returns(Task.FromResult(fakeClients));
             var controller = new ClientController(repository, _mapper!);
 
             //Act

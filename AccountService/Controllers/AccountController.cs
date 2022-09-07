@@ -23,17 +23,17 @@ namespace AccountService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<AccountDto>>> Get()
+        public async Task<ActionResult<List<AccountDto>>> GetAsync()
         {
-            var Accounts = await _repository.GetAll();
+            var Accounts = await _repository.GetAsync();
             var AccountsDto = _mapper.Map<IEnumerable<AccountDto>>(Accounts);
             return AccountsDto.Any() ? Ok(AccountsDto) : NoContent();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AccountDto>> FindAccount(String id)
+        public async Task<ActionResult<AccountDto>> GetByNumberAsync(String id)
         {
-            var Account = await _repository.Find(x => x.Number == id);
+            var Account = await _repository.FindAsync(x => x.Number == id);
             if (Account == null)
             {
                 return BadRequest("Account not found");
@@ -44,21 +44,21 @@ namespace AccountService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<AccountDto>>> AddAccount(AccountDto AccountDto)
+        public async Task<ActionResult<List<AccountDto>>> PostAsync(CreateAccountDto createAccountDto)
         {
-            if (AccountDto is null)
+            if (createAccountDto is null)
             {
                 return BadRequest("No Account to add");
             }
 
 
-            var Account = await _repository.Find(x => x.Number == AccountDto.Number);
+            var Account = await _repository.FindAsync(x => x.Number == createAccountDto.Number);
             if (Account is not null)
             {
                 return BadRequest("Already in database");
             }
 
-            var client = await _remoteClientService.GetClientByIdAsync(AccountDto.ClientId);
+            var client = await _remoteClientService.GetClientByIdAsync(createAccountDto.ClientId);
 
             if (client is null)
             {
@@ -67,64 +67,61 @@ namespace AccountService.Controllers
 
             var newAccount = new Account
             {
-                ClientId = AccountDto.ClientId,
-                Status = AccountDto.Status,
-                Number = AccountDto.Number,
-                InitialBalance = AccountDto.InitialBalance,
-                Type = AccountDto.Type,
+                Id = Guid.NewGuid(),
+                ClientId = createAccountDto.ClientId,
+                Status = createAccountDto.Status,
+                Number = createAccountDto.Number,
+                InitialBalance = createAccountDto.InitialBalance,
+                Type = createAccountDto.Type,
             };
 
-            _repository.Add(newAccount);
-            await _repository.Save();
+            _repository.AddAsync(newAccount);
+            await _repository.SaveAsync();
 
-            var Accounts = await _repository.GetAll();
-            var AccountsDto = _mapper.Map<IEnumerable<AccountDto>>(Accounts);
+            var AccountDto = _mapper.Map<AccountDto>(newAccount);
 
-            return Ok(AccountsDto);
+
+            return CreatedAtAction(nameof(GetByNumberAsync), new { id = newAccount.Id }, AccountDto);
         }
 
         [HttpPut]
-        public async Task<ActionResult<AccountDto>> UpdateAccount(AccountDto AccountDtoUpdate)
+        public async Task<ActionResult<AccountDto>> PutAsync(UpdateAccountDto updateAccountDto)
         {
-            if (AccountDtoUpdate == null)
+            if (updateAccountDto == null)
             {
                 return BadRequest("No Account to add");
             }
-            var AccountInDB = await _repository.Find(x => x.Id == AccountDtoUpdate.Id);
+            var AccountInDB = await _repository.FindAsync(x => x.Number == updateAccountDto.Number);
             if (AccountInDB is null)
             {
-                return BadRequest("Account not in database");
+                return BadRequest("Account number not in database");
             }
 
+            AccountInDB.Type = updateAccountDto.Type;
+            AccountInDB.InitialBalance = updateAccountDto.InitialBalance;
+            AccountInDB.ClientId = updateAccountDto.ClientId;
+            AccountInDB.Status = updateAccountDto.Status;
 
-            AccountInDB.Number = AccountDtoUpdate.Number;
-            AccountInDB.Type = AccountDtoUpdate.Type;
-            AccountInDB.InitialBalance = AccountDtoUpdate.InitialBalance;
-            AccountInDB.ClientId = AccountDtoUpdate.ClientId;
-            AccountInDB.Status = AccountDtoUpdate.Status;
-
-            _repository.Update(AccountInDB);
-            await _repository.Save();
+            _repository.UpdateAsync(AccountInDB);
+            await _repository.SaveAsync();
 
             var AccountDto = _mapper.Map<AccountDto>(AccountInDB);
             return Ok(AccountDto);
         }
+
         [HttpDelete]
-        public async Task<ActionResult<List<AccountDto>>> RemoveAccount(AccountDto account)
+        public async Task<ActionResult<List<AccountDto>>> DeleteAsync(AccountDto account)
         {
-            var AccountInDB = await _repository.Find(x => x.Id == account.Id);
+            var AccountInDB = await _repository.FindAsync(x => x.Id == account.Id);
             if (AccountInDB is null)
             {
-                return BadRequest("Account not found");
+                return NotFound("Account not found");
             }
 
-            _repository.Delete(AccountInDB.Id);
-            await _repository.Save();
+            _repository.DeleteAsync(AccountInDB.Id);
+            await _repository.SaveAsync();
 
-            var Accounts = await _repository.GetAll();
-            var AccountsDto = _mapper.Map<IEnumerable<AccountDto>>(Accounts);
-
-            return Ok(AccountsDto);
+            return Ok(AccountInDB);
         }
     }
 }

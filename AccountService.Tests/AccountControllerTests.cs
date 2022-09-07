@@ -17,17 +17,13 @@ namespace AccountService.Tests
         {
             if (_mapper == null)
             {
-                var mappingConfig = new MapperConfiguration(mc =>
-                {
-                    mc.AddProfile(new AccountDtoProfile());
-                });
-
+                var mappingConfig = new MapperConfiguration(mc => mc.AddProfile(new AccountDtoProfile()));
                 _mapper = mappingConfig.CreateMapper();
             }
         }
 
         [Fact]
-        public async void Get_Returns_Ok_Response_List_of_cuentas_When_Data_Exist()
+        public async void Get_Returns_Ok_Response_List_of_Accounts_When_Data_Exist()
         {
             //Arrange
             int count = 5;
@@ -35,16 +31,15 @@ namespace AccountService.Tests
             var _repository = A.Fake<IAccountRepository<Account>>();
             var remoteClientService = A.Fake<RemoteClientService>();
 
-            A.CallTo(() => _repository.GetAll()).Returns(Task.FromResult(fakeClients));
+            A.CallTo(() => _repository.GetAsync()).Returns(Task.FromResult(fakeClients));
             var controller = new AccountController(_repository, _mapper!, remoteClientService);
 
             //Act
-            var actionResult = await controller.Get();
+            var actionResult = await controller.GetAsync();
 
             //Assert
-            var result = actionResult.Result as OkObjectResult;
-            var returnClientes = result != null ? result.Value as IEnumerable<AccountDto> : null;
-            Assert.Equal(count, returnClientes is not null ? returnClientes.Count() : 0);
+            var returnAccounts = actionResult.Result is OkObjectResult result ? result.Value as IEnumerable<AccountDto> : null;
+            Assert.Equal(count, returnAccounts!.Count());
         }
 
         [Fact]
@@ -56,11 +51,11 @@ namespace AccountService.Tests
             var _repository = A.Fake<IAccountRepository<Account>>();
             var remoteClientService = A.Fake<RemoteClientService>();
 
-            A.CallTo(() => _repository.GetAll()).Returns(Task.FromResult(fakeClients));
+            A.CallTo(() => _repository.GetAsync()).Returns(Task.FromResult(fakeClients));
             var controller = new AccountController(_repository, _mapper!, remoteClientService);
 
             //Act
-            var actionResult = await controller.Get();
+            var actionResult = await controller.GetAsync();
 
             //Assert
             var result = actionResult.Result;

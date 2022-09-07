@@ -25,9 +25,9 @@ namespace TransactionService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<TransactionDto>>> Get()
+        public async Task<ActionResult<List<TransactionDto>>> GetAsync()
         {
-            var Transactions = await _repository.GetAll();
+            var Transactions = await _repository.GetAsync();
             var TransactionsDto = _mapper.Map<IEnumerable<TransactionDto>>(Transactions);
 
             return TransactionsDto.Any() ? Ok(TransactionsDto) : NoContent();
@@ -35,12 +35,12 @@ namespace TransactionService.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<TransactionDto>> Find(Guid id)
+        public async Task<ActionResult<TransactionDto>> GetByIdAsync(Guid id)
         {
-            var Transaction = await _repository.Get(id);
+            var Transaction = await _repository.GetAsync(id);
             if (Transaction == null)
             {
-                return BadRequest("Transaction not found");
+                return NotFound("Transaction not found");
             }
             var TransactionDto = _mapper.Map<TransactionDto>(Transaction);
 
@@ -48,30 +48,25 @@ namespace TransactionService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<TransactionDto>>> Add(TransactionDto transactionDto)
+        public async Task<ActionResult<List<TransactionDto>>> PostAsync(CreateTransactionDto createTransactionDto)
         {
-            if (transactionDto is null)
+            if (createTransactionDto is null)
             {
                 return BadRequest("No Transaction to add");
             }
 
-            var Transaction = await _repository.Find(x => x.Id == transactionDto.Id);
-            if (Transaction != null)
+            if (createTransactionDto.Amount == 0)
             {
-                return BadRequest("Already in database");
+                return BadRequest("Valor es 0");
             }
 
-            var accountDto = await _remoteAccountService.GetAccountByIdAsync(transactionDto.AccountNumber!);
+            var accountDto = await _remoteAccountService.GetAccountByIdAsync(createTransactionDto.AccountNumber!);
 
             if (accountDto == null)
             {
                 return BadRequest("Account not found in database");
             }
 
-            if (transactionDto.Amount == 0)
-            {
-                return BadRequest("Valor es 0");
-            }
 
             // Los valores cuando son crédito son positivos, y los débitos son negativos.
             // Debe almacenarse el saldo disponible en cada transacción dependiendo del
@@ -88,15 +83,15 @@ namespace TransactionService.Controllers
                               lastTransaction.Amount :
                               accountDto.InitialBalance;
 
-            if (transactionDto.Amount < 0)
+            if (createTransactionDto.Amount < 0)
             {
-                if (lastBalance + transactionDto.Amount < 0)
+                if (lastBalance + createTransactionDto.Amount < 0)
                 {
                     return BadRequest("Amount no available for withdrawn");
                 }
             }
 
-            balanceAvailable = lastBalance + transactionDto.Amount;
+            balanceAvailable = lastBalance + createTransactionDto.Amount;
 
             // Se debe tener un parámetro de limite diario de retiro (valor tope 1000$)
 
@@ -119,60 +114,58 @@ namespace TransactionService.Controllers
 
             var newTransaction = new Transaction
             {
-                Amount = transactionDto.Amount,
+                Amount = createTransactionDto.Amount,
                 Balance = balanceAvailable,
                 AccountId = accountDto.Id,
-                Account = account
+                Account = account,
             };
 
-            _repository.Add(newTransaction);
-            await _repository.Save();
+            _repository.AddAsync(newTransaction);
+            await _repository.SaveAsync();
 
-            var Transactions = await _repository.GetAll();
-            var TransactionsDto = _mapper.Map<IEnumerable<TransactionDto>>(Transactions);
 
-            return Ok(TransactionsDto);
+            var transactionDto = _mapper.Map<TransactionDto>(newTransaction);
+
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = newTransaction.Id }, transactionDto);
+
         }
 
         [HttpPut]
-        public async Task<ActionResult<TransactionDto>> UpdateTransaction(TransactionDto TransactionDtoUpdate)
+        public async Task<ActionResult<TransactionDto>> PutAsync(UpdateTransactionDto updateTransactionDto)
         {
-            if (TransactionDtoUpdate == null)
+            if (updateTransactionDto == null)
             {
                 return BadRequest("No Transaction to add");
             }
-            var transactionDB = await _repository.Find(x => x.Id == TransactionDtoUpdate.Id);
+            var transactionDB = await _repository.FindAsync(x => x.Id == updateTransactionDto.Id);
             if (transactionDB == null)
             {
-                return BadRequest("Transaction not in database");
+                return NotFound("Transaction not in database");
             }
 
-            transactionDB.Amount = TransactionDtoUpdate.Amount;
-            transactionDB.Balance = TransactionDtoUpdate.Balance;
-            transactionDB.AccountId = TransactionDtoUpdate.AccountId;
+            transactionDB.Amount = updateTransactionDto.Amount;
+            transactionDB.Balance = updateTransactionDto.Balance;
+            transactionDB.AccountId = updateTransactionDto.AccountId;
 
-            _repository.Update(transactionDB);
-            await _repository.Save();
+            _repository.UpdateAsync(transactionDB);
+            await _repository.SaveAsync();
             var TransactionDto = _mapper.Map<TransactionDto>(transactionDB);
 
             return Ok(TransactionDto);
         }
 
         [HttpDelete]
-        public async Task<ActionResult<List<TransactionDto>>> RemoveTransaction(TransactionDto transactionDto)
+        public async Task<ActionResult<List<TransactionDto>>> DeleteAsync(TransactionDto transactionDto)
         {
-            var transactionDB = await _repository.Find(x => x.Id == transactionDto.Id);
+            var transactionDB = await _repository.FindAsync(x => x.Id == transactionDto.Id);
             if (transactionDB == null)
             {
-                return BadRequest("Transaction not found");
+                return NotFound("Transaction not found");
             }
-            _repository.Delete(transactionDB.Id);
-            await _repository.Save();
+            _repository.DeleteAsync(transactionDB.Id);
+            await _repository.SaveAsync();
 
-            var transactions = await _repository.GetAll();
-            var transactionsDto = _mapper.Map<IEnumerable<TransactionDto>>(transactions);
-
-            return Ok(transactionsDto);
+            return Ok(transactionDB);
         }
     }
 }

@@ -13,20 +13,20 @@ namespace Common.Repositories
             Context = context;
         }
 
-        public async Task<TEntity?> Get(Guid id)
+        public async Task<TEntity?> GetAsync(Guid id)
         {
             return await Context.Set<TEntity>().FindAsync(id);
         }
-        public async Task<IEnumerable<TEntity>> GetAll()
+        public async Task<IEnumerable<TEntity>> GetAsync()
         {
             return await Context.Set<TEntity>().ToListAsync();
         }
-        public async Task<TEntity?> Find(Expression<Func<TEntity, bool>> predicate)
+        public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return await Context.Set<TEntity>().Where(predicate).FirstOrDefaultAsync();
         }
 
-        public async virtual Task<IEnumerable<TEntity>> FindAll(
+        public async virtual Task<IEnumerable<TEntity>> FindAsync(
            Expression<Func<TEntity, bool>>? filter = null,
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
            string includeProperties = "")
@@ -55,26 +55,26 @@ namespace Common.Repositories
         }
 
 
-        public void Add(TEntity entity)
+        public void AddAsync(TEntity entity)
         {
             Context.Set<TEntity>().Add(entity);
         }
 
-        public async void Delete(Guid id)
+        public async void DeleteAsync(Guid id)
         {
-            var entity = await Get(id);
+            var entity = await GetAsync(id);
             if (entity != null)
                 Context.Set<TEntity>().Remove(entity);
         }
 
-        public void Update(TEntity entity)
+        public void UpdateAsync(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Modified;
 
         }
 
 
-        public async Task<int> Save()
+        public async Task<int> SaveAsync()
         {
             return await Context.SaveChangesAsync();
         }
