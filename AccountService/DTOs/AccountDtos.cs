@@ -12,7 +12,7 @@
         string? Type,
         decimal InitialBalance,
         bool Status,
-        Guid ClientId);
+        string ClientIdentification);
     public record UpdateAccountDto(
         string? Number,
         string? Type,

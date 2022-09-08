@@ -58,17 +58,19 @@ namespace AccountService.Controllers
                 return BadRequest("Already in database");
             }
 
-            var client = await _remoteClientService.GetClientByIdAsync(createAccountDto.ClientId);
+            var clientDto = await _remoteClientService.GetClientByIdAsync(createAccountDto.ClientIdentification);
 
-            if (client is null)
+            if (clientDto is null)
             {
                 return BadRequest("Client not found in database");
             }
 
+            var client = _mapper.Map<Client>(clientDto);
+
             var newAccount = new Account
             {
                 Id = Guid.NewGuid(),
-                ClientId = createAccountDto.ClientId,
+                ClientId = clientDto.Id,
                 Status = createAccountDto.Status,
                 Number = createAccountDto.Number,
                 InitialBalance = createAccountDto.InitialBalance,

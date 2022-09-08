@@ -7,5 +7,5 @@ public class SqlServerSettings{
     public string? Database  {get;init;}
     public string? UserId  {get;init;}
     public string? Password  {get;init;}
-    public string DefaultContext => $"Server={Host}:{Port}\\{Instance},;Database={Database};User Id={UserId};Password={Password};MultipleActiveResultSets=true";
+    public string DefaultContext => $"Server={Host},{Port};Database={Database};User Id={UserId};Password={Password};";
 }

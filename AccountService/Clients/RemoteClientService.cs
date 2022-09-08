@@ -12,7 +12,7 @@ namespace AccountService.Clients
             this.httpClient = httpClient;
         }
 
-        public async Task<ClientDto> GetClientByIdAsync(Guid ClientId)
+        public async Task<ClientDto> GetClientByIdAsync(string ClientId)
         {
             HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Client/{ClientId}");
             if (res.IsSuccessStatusCode)

@@ -29,10 +29,10 @@ namespace ClientService.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ClientDto>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<ClientDto>> GetByIdAsync(string id)
         {
 
-            var client = await _repository.GetAsync(id);
+            var client = await _repository.FindAsync(x => x.Identification == id);
             if (client == null)
             {
                 return NotFound("client not found");

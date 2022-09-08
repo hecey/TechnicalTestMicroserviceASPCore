@@ -10,6 +10,6 @@ namespace AccountService.Data
         {
         }
 
-        public DbSet<Account> Person { get; set; } = default!;
+        public DbSet<Account> Account { get; set; } = default!;
     }
 }

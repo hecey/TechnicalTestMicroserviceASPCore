@@ -5,7 +5,6 @@ namespace ClientService.Data
 {
     public class DataContext : DbContext
     {
-
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
@@ -13,6 +12,5 @@ namespace ClientService.Data
 
         public DbSet<Person> Person { get; set; } = default!;
         public DbSet<Client> Client { get; set; } = default!;
-
     }
 }

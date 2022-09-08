@@ -59,8 +59,13 @@ namespace TransactionService.Controllers
             {
                 return BadRequest("Valor es 0");
             }
+            if (createTransactionDto.AccountNumber is null)
+            {
+                return BadRequest("No AccountNumber");
+            }
 
-            var accountDto = await _remoteAccountService.GetAccountByIdAsync(createTransactionDto.AccountNumber!);
+
+            var accountDto = await _remoteAccountService.GetAccountByNumberAsync(createTransactionDto.AccountNumber);
 
             if (accountDto == null)
             {
@@ -94,7 +99,6 @@ namespace TransactionService.Controllers
             balanceAvailable = lastBalance + createTransactionDto.Amount;
 
             // Se debe tener un parámetro de limite diario de retiro (valor tope 1000$)
-
             var dailyLimitForWithdrawn = _configRoot.GetValue<decimal>("dailyLimitForWithdrawn");
 
             if (dailyLimitForWithdrawn <= 0)
@@ -117,7 +121,9 @@ namespace TransactionService.Controllers
                 Amount = createTransactionDto.Amount,
                 Balance = balanceAvailable,
                 AccountId = accountDto.Id,
-                Account = account,
+                AccountNumber = createTransactionDto.AccountNumber
+
+
             };
 
             _repository.AddAsync(newTransaction);
@@ -126,7 +132,7 @@ namespace TransactionService.Controllers
 
             var transactionDto = _mapper.Map<TransactionDto>(newTransaction);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = newTransaction.Id }, transactionDto);
+            return Ok(transactionDto);
 
         }
 

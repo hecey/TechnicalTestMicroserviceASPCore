@@ -11,7 +11,7 @@ namespace TransactionService.Clients
             this.httpClient = httpClient;
         }
 
-        public async Task<AccountDto> GetAccountByIdAsync(String accountNumber)
+        public async Task<AccountDto> GetAccountByNumberAsync(String accountNumber)
         {
             HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Account/{accountNumber}");
             if (res.IsSuccessStatusCode)

@@ -1,5 +1,6 @@
 ﻿using AccountService.DTOs;
 using AutoMapper;
+using ClientService.DTOs;
 using Common.Entities;
 
 namespace AccountService.Profiles
@@ -10,7 +11,7 @@ namespace AccountService.Profiles
         {
             //Source => Dest
             CreateMap<Account, AccountDto>();
-
+            CreateMap<ClientDto, Client>();
         }
     }
 }

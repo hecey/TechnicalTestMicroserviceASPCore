@@ -16,5 +16,8 @@ namespace Common.Entities
         [JsonIgnore]
         public Client Client { get; set; } = null!;
         public Guid ClientId { get; set; }
+
+        public ICollection<Transaction>? Transaction { get; set; }
+
     }
 }
