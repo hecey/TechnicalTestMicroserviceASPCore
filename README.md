@@ -81,3 +81,33 @@ Inside your **Program.cs**
 ```
 
 Further information about Github packages configuration: [Working with the NuGet registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry)
+
+## Docker hub
+
+Upload image.
+
+```Powershell
+ docker tag {NameOfImage}:dev hecey/{NameOfImage}
+
+ docker push hecey/{NameOfImage}
+ ```
+
+## If auto create of Database is needed
+
+(I didn't need it, instead I used a script on the SQLServer Docker Container)
+
+Add following to context constructor:
+
+```C#
+try
+{
+   if(databaseCreator!=null)
+   {
+   var databaseCreator  = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+       if(!databaseCreator.CanConnect())databaseCreator.Create();
+       if(!databaseCreator.HasTables())databaseCreator.CreateTables();
+catch(Exception ex)
+{
+   Console.WriteLine ( ex.Message ) ;
+}
+```

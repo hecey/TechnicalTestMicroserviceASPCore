@@ -7,7 +7,13 @@ using Hecey.TTM.Common.Settings;
 using Microsoft.EntityFrameworkCore;
 
 var isDevelopment=true;
-SqlServerSettings sqlServerSettings;
+SqlServerSettings sqlServerSettings = new (){
+     Host=Environment.GetEnvironmentVariable("Host"),
+     Port=Environment.GetEnvironmentVariable("Port"),
+     Database=Environment.GetEnvironmentVariable("Database"),
+     UserId=Environment.GetEnvironmentVariable("UserId"),
+     Password=Environment.GetEnvironmentVariable("Password")
+     };
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,7 +23,8 @@ sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
-builder.Services.AddHttpClient<RemoteClientService>(client => client.BaseAddress = new Uri($"https://{sqlServerSettings.Host}:7149/api"))
+builder.Services.AddHttpClient<RemoteClientService>(client => client.BaseAddress =
+                    new Uri($"https://{sqlServerSettings.Host}:{Environment.GetEnvironmentVariable("RemoteClientServiceHTTPSPort")}/api"))
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() {
                     // Return `true` to allow certificates that are untrusted/invalid
                     ServerCertificateCustomValidationCallback = (isDevelopment)?HttpClientHandler.DangerousAcceptAnyServerCertificateValidator:null

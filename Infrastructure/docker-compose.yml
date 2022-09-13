@@ -28,6 +28,11 @@ services:
         ASPNETCORE_URLS: "https://+;http://+"
         ASPNETCORE_HTTPS_PORT: "7149"
         ASPNETCORE_ENVIRONMENT: "Development"
+        Host: "host.docker.internal"
+        Port: "1401"
+        Database: "ClientsDB"
+        UserId: "sa"
+        Password: "Sql1234!"
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
@@ -42,6 +47,12 @@ services:
         ASPNETCORE_URLS: "https://+;http://+"
         ASPNETCORE_HTTPS_PORT: "7002"
         ASPNETCORE_ENVIRONMENT: "Development"
+        Host: "host.docker.internal"
+        Port: "1401"
+        Database: "AccountsDB"
+        UserId: "sa"
+        Password: "Sql1234!"
+        RemoteClientServiceHTTPSPort: "7149"
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
@@ -56,6 +67,12 @@ services:
         ASPNETCORE_URLS: "https://+;http://+"
         ASPNETCORE_HTTPS_PORT: "7009"
         ASPNETCORE_ENVIRONMENT: "Development"
+        Host: "host.docker.internal"
+        Port: "1401"
+        Database: "AccountsDB"
+        UserId: "sa"
+        Password: "Sql1234!"
+        RemoteAccountServiceHTTPSPort: "7002"
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/

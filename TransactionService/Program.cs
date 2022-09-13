@@ -7,7 +7,13 @@ using TransactionService.Data;
 using TransactionService.Repositories;
 
 var isDevelopment=true;
-SqlServerSettings sqlServerSettings;
+SqlServerSettings sqlServerSettings = new (){
+     Host=Environment.GetEnvironmentVariable("Host"),
+     Port=Environment.GetEnvironmentVariable("Port"),
+     Database=Environment.GetEnvironmentVariable("Database"),
+     UserId=Environment.GetEnvironmentVariable("UserId"),
+     Password=Environment.GetEnvironmentVariable("Password")
+     };
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -18,7 +24,7 @@ sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
-builder.Services.AddHttpClient<RemoteAccountService>(client => client.BaseAddress = new Uri($"https://{sqlServerSettings.Host}:7002/api"))
+builder.Services.AddHttpClient<RemoteAccountService>(client => client.BaseAddress = new Uri($"https://{sqlServerSettings.Host}:{Environment.GetEnvironmentVariable("RemoteAccountServiceHTTPSPort")}/api"))
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() {
                     // Return `true` to allow certificates that are untrusted/invalid
                     ServerCertificateCustomValidationCallback = (isDevelopment)?HttpClientHandler.DangerousAcceptAnyServerCertificateValidator:null
