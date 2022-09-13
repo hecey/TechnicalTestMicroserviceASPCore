@@ -79,3 +79,5 @@ Inside your **Program.cs**
     ...
 </ItemGroup>
 ```
+
+Further information about Github packages configuration: [Working with the NuGet registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry)
