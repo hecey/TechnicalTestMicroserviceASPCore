@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Common.Entities
+namespace Hecey.TTM.Common.Entities
 {
 
     public class Person : IEntity

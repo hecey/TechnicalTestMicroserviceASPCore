@@ -3,8 +3,8 @@ using AccountService.Controllers;
 using AccountService.DTOs;
 using AccountService.Profiles;
 using AutoMapper;
-using Common.Entities;
-using Common.Repositories;
+using Hecey.TTM.Common.Entities;
+using Hecey.TTM.Common.Repositories;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 

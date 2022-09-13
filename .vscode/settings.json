@@ -1,6 +1,7 @@
 {
     "dotnet-test-explorer.testProjectPath": "../TTM.Api.Tests",
     "cSpell.words": [
+        "Hecey",
         "SQLEXPRESS"
     ]
 }

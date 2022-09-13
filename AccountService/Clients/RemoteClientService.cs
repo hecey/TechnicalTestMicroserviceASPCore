@@ -6,10 +6,12 @@ namespace AccountService.Clients
     public class RemoteClientService
     {
         private readonly HttpClient httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public RemoteClientService(HttpClient httpClient)
+        public RemoteClientService(HttpClient httpClient,IHttpClientFactory httpClientFactory)
         {
             this.httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<ClientDto> GetClientByIdAsync(string ClientId)

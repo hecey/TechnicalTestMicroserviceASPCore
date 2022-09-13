@@ -1,4 +1,4 @@
-namespace Common.Entities
+namespace Hecey.TTM.Common.Entities
 {
     public interface IEntity
     {

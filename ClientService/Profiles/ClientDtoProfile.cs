@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ClientService.DTOs;
-using Common.Entities;
+using Hecey.TTM.Common.Entities;
 
 namespace ClientService.Profiles
 {

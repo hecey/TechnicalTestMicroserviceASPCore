@@ -1,6 +1,6 @@
 ﻿using TransactionService.Data;
-using Common.Repositories;
-using Common.Entities;
+using Hecey.TTM.Common.Repositories;
+using Hecey.TTM.Common.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace TransactionService.Repositories

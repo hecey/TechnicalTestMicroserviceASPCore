@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Common.Entities
+namespace Hecey.TTM.Common.Entities
 {
     public class Account
     {

@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Common.Repositories
+namespace Hecey.TTM.Common.Repositories
 {
     public interface IRepository<TEntity> where TEntity : class
     {
@@ -13,10 +13,10 @@ namespace Common.Repositories
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
            string includeProperties = "");
 
-        void AddAsync(TEntity entity);
+        void Add(TEntity entity);
 
-        void UpdateAsync(TEntity entity);
-        void DeleteAsync(Guid id);
+        void Update(TEntity entity);
+        void Delete(Guid id);
         Task<int> SaveAsync();
     }
 }

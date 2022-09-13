@@ -1,6 +1,6 @@
-﻿namespace Common.Repositories
+﻿namespace Hecey.TTM.Common.Repositories
 {
-    public interface IClientRepository<T> : IRepository<T>, IDisposable where T : class
+    public interface IClientRepository<TEntity> : IRepository<TEntity>, IDisposable where TEntity : class
     {
     }
 }

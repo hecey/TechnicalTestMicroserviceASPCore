@@ -1,5 +1,5 @@
 ﻿using ClientService.Data;
-using Common.Repositories;
+using Hecey.TTM.Common.Repositories;
 
 namespace ClientService.Repositories
 {

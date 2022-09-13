@@ -1,5 +1,5 @@
 ﻿using AccountService.Data;
-using Common.Repositories;
+using Hecey.TTM.Common.Repositories;
 
 namespace AccountService.Repositories
 {

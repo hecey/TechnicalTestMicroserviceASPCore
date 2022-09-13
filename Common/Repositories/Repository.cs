@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace Common.Repositories
+namespace Hecey.TTM.Common.Repositories
 {
-
     public class Repository<TEntity> : IRepository<TEntity>, IDisposable where TEntity : class
     {
         protected readonly DbContext Context;
@@ -54,31 +53,27 @@ namespace Common.Repositories
             }
         }
 
-
-        public void AddAsync(TEntity entity)
+        public void Add(TEntity entity)
         {
             Context.Set<TEntity>().Add(entity);
         }
 
-        public async void DeleteAsync(Guid id)
+        public async void Delete(Guid id)
         {
             var entity = await GetAsync(id);
             if (entity != null)
                 Context.Set<TEntity>().Remove(entity);
         }
 
-        public void UpdateAsync(TEntity entity)
+        public void Update(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Modified;
-
         }
-
 
         public async Task<int> SaveAsync()
         {
             return await Context.SaveChangesAsync();
         }
-
 
         private bool disposed = false;
 

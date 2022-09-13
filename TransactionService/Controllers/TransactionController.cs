@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Common.Entities;
-using Common.Repositories;
+using Hecey.TTM.Common.Entities;
+using Hecey.TTM.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using TransactionService.Clients;
 using TransactionService.DTOs;
@@ -31,7 +31,6 @@ namespace TransactionService.Controllers
             var TransactionsDto = _mapper.Map<IEnumerable<TransactionDto>>(Transactions);
 
             return TransactionsDto.Any() ? Ok(TransactionsDto) : NoContent();
-
         }
 
         [HttpGet("{id}")]
@@ -64,14 +63,12 @@ namespace TransactionService.Controllers
                 return BadRequest("No AccountNumber");
             }
 
-
             var accountDto = await _remoteAccountService.GetAccountByNumberAsync(createTransactionDto.AccountNumber);
 
             if (accountDto == null)
             {
                 return BadRequest("Account not found in database");
             }
-
 
             // Los valores cuando son crédito son positivos, y los débitos son negativos.
             // Debe almacenarse el saldo disponible en cada transacción dependiendo del
@@ -85,7 +82,7 @@ namespace TransactionService.Controllers
             var lastTransaction = await _repository.LastTransactionByAccount(accountDto.Id);
 
             lastBalance = lastTransaction is not null ?
-                              lastTransaction.Amount :
+                              lastTransaction.Balance :
                               accountDto.InitialBalance;
 
             if (createTransactionDto.Amount < 0)
@@ -122,18 +119,14 @@ namespace TransactionService.Controllers
                 Balance = balanceAvailable,
                 AccountId = accountDto.Id,
                 AccountNumber = createTransactionDto.AccountNumber
-
-
             };
 
-            _repository.AddAsync(newTransaction);
+            _repository.Add(newTransaction);
             await _repository.SaveAsync();
-
 
             var transactionDto = _mapper.Map<TransactionDto>(newTransaction);
 
             return Ok(transactionDto);
-
         }
 
         [HttpPut]
@@ -153,7 +146,7 @@ namespace TransactionService.Controllers
             transactionDB.Balance = updateTransactionDto.Balance;
             transactionDB.AccountId = updateTransactionDto.AccountId;
 
-            _repository.UpdateAsync(transactionDB);
+            _repository.Update(transactionDB);
             await _repository.SaveAsync();
             var TransactionDto = _mapper.Map<TransactionDto>(transactionDB);
 
@@ -168,7 +161,7 @@ namespace TransactionService.Controllers
             {
                 return NotFound("Transaction not found");
             }
-            _repository.DeleteAsync(transactionDB.Id);
+            _repository.Delete(transactionDB.Id);
             await _repository.SaveAsync();
 
             return Ok(transactionDB);

@@ -1,6 +1,6 @@
 using AutoMapper;
-using Common.Entities;
-using Common.Repositories;
+using Hecey.TTM.Common.Entities;
+using Hecey.TTM.Common.Repositories;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -20,20 +20,15 @@ namespace TransactionService.Tests
         {
             if (_mapper == null)
             {
-                var mappingConfig = new MapperConfiguration(mc =>
-                {
-                    mc.AddProfile(new TransactionDtoProfile());
-                });
+                var mappingConfig = new MapperConfiguration(mc => mc.AddProfile(new TransactionDtoProfile()));
 
                 IMapper mapper = mappingConfig.CreateMapper();
                 _mapper = mapper;
-
             }
             _configRoot = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
             .Build();
-
         }
         [Fact]
         public async void Get_Returns_Ok_Response_List_of_cuentas_When_Data_Exist()
@@ -41,36 +36,31 @@ namespace TransactionService.Tests
             //Arrange
             int count = 5;
             var fakeClients = A.CollectionOfDummy<Transaction>(count).AsEnumerable();
-            var _repsitory = A.Fake<ITransactionRepository<Transaction>>();
+            var _repository = A.Fake<ITransactionRepository<Transaction>>();
             var remoteAccountService = A.Fake<RemoteAccountService>();
 
-
-            A.CallTo(() => _repsitory.GetAsync()).Returns(Task.FromResult(fakeClients));
-            var controller = new TransactionController(_repsitory, _configRoot!, _mapper!, remoteAccountService);
+            A.CallTo(() => _repository.GetAsync()).Returns(Task.FromResult(fakeClients));
+            var controller = new TransactionController(_repository, _configRoot!, _mapper!, remoteAccountService);
 
             //Act
             var actionResult = await controller.GetAsync();
 
             //Assert
-            var result = actionResult.Result as OkObjectResult;
-            var returnClientes = result != null ? result.Value as IEnumerable<TransactionDto> : null;
-            Assert.Equal(count, returnClientes is not null ? returnClientes.Count() : 0);
-
-
+            var returnTransactions = actionResult.Result is OkObjectResult result ? result.Value as IEnumerable<TransactionDto> : null;
+            Assert.Equal(count, (returnTransactions?.Count()) ?? 0);
         }
 
         [Fact]
         public async void Get_Returns_NoContent_Response_When_Data_Not_Exist()
         {
             //Arrange
-            int count = 0;
-            var fakeClients = A.CollectionOfDummy<Transaction>(count).AsEnumerable();
-            var _repsitory = A.Fake<ITransactionRepository<Transaction>>();
+            const int count = 0;
+            var fakeTransaction = A.CollectionOfDummy<Transaction>(count).AsEnumerable();
+            var _repository = A.Fake<ITransactionRepository<Transaction>>();
             var remoteAccountService = A.Fake<RemoteAccountService>();
-            A.CallTo(() => _repsitory.GetAsync()).Returns(Task.FromResult(fakeClients));
+            A.CallTo(() => _repository.GetAsync()).Returns(Task.FromResult(fakeTransaction));
 
-
-            var controller = new TransactionController(_repsitory, _configRoot!, _mapper!, remoteAccountService);
+            var controller = new TransactionController(_repository, _configRoot!, _mapper!, remoteAccountService);
 
             //Act
             var actionResult = await controller.GetAsync();
@@ -78,8 +68,6 @@ namespace TransactionService.Tests
             //Assert
             var result = actionResult.Result;
             Assert.IsType<NoContentResult>(result);
-
-
         }
     }
 }

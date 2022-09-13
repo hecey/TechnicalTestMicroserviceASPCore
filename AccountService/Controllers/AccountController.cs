@@ -1,8 +1,8 @@
 ﻿using AccountService.Clients;
 using AccountService.DTOs;
 using AutoMapper;
-using Common.Entities;
-using Common.Repositories;
+using Hecey.TTM.Common.Entities;
+using Hecey.TTM.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Controllers
@@ -77,7 +77,7 @@ namespace AccountService.Controllers
                 Type = createAccountDto.Type,
             };
 
-            _repository.AddAsync(newAccount);
+            _repository.Add(newAccount);
             await _repository.SaveAsync();
 
             var AccountDto = _mapper.Map<AccountDto>(newAccount);
@@ -104,7 +104,7 @@ namespace AccountService.Controllers
             AccountInDB.ClientId = updateAccountDto.ClientId;
             AccountInDB.Status = updateAccountDto.Status;
 
-            _repository.UpdateAsync(AccountInDB);
+            _repository.Update(AccountInDB);
             await _repository.SaveAsync();
 
             var AccountDto = _mapper.Map<AccountDto>(AccountInDB);
@@ -120,7 +120,7 @@ namespace AccountService.Controllers
                 return NotFound("Account not found");
             }
 
-            _repository.DeleteAsync(AccountInDB.Id);
+            _repository.Delete(AccountInDB.Id);
             await _repository.SaveAsync();
 
             return Ok(AccountInDB);

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Common.Entities;
+using Hecey.TTM.Common.Entities;
 using TransactionService.DTOs;
 
 namespace TransactionService.Profiles

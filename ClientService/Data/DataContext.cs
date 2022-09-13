@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Common.Entities;
+﻿using Hecey.TTM.Common.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClientService.Data
 {

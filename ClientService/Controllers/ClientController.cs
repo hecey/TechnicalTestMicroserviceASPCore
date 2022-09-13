@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ClientService.DTOs;
-using Common.Entities;
-using Common.Repositories;
+using Hecey.TTM.Common.Entities;
+using Hecey.TTM.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientService.Controllers
@@ -80,7 +80,7 @@ namespace ClientService.Controllers
                 Status = createClientDto.Status
             };
 
-            _repository.AddAsync(newClient);
+            _repository.Add(newClient);
             await _repository.SaveAsync();
 
             var clientDto = _mapper.Map<ClientDto>(newClient);
@@ -119,7 +119,7 @@ namespace ClientService.Controllers
             clientDB.Password = updateClientDto.Password;
             clientDB.Status = updateClientDto.Status;
 
-            _repository.UpdateAsync(clientDB);
+            _repository.Update(clientDB);
             await _repository.SaveAsync();
 
             var clientDto = _mapper.Map<ClientDto>(clientDB);
@@ -149,7 +149,7 @@ namespace ClientService.Controllers
 
 
 
-            _repository.DeleteAsync(clientDB.Id);
+            _repository.Delete(clientDB.Id);
             await _repository.SaveAsync();
 
             return Ok(clientDB);
