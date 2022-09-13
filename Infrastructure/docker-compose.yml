@@ -1,4 +1,3 @@
-#docker run --name sqlserver -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=Sql1234!' -p 1401:1433 -d mcr.microsoft.com/mssql/server:2019-latest
 version: '3.8'
 
 services:
@@ -14,12 +13,13 @@ services:
       - ./data:/var/lib/mssqlql/data
       - ./db/mssql/docker-entrypoint.sh:/entrypoint.sh
       - ./db/mssql/docker-db-init.sh:/db-init.sh
-      - ./db/mssql/mssql-clientsdb.sql:/db-init.sql
+      - ./db/mssql/mssql-dbs.sql:/db-init.sql
     environment:
         ACCEPT_EULA: "Y"
         SA_PASSWORD: "Sql1234!"
   clientservice:
     image: clientservice:dev
+    build: ../clientservice
     container_name: clientservice
     ports:
       - 5019:80
@@ -33,6 +33,7 @@ services:
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
   accountservice:
     image: accountservice:dev
+    build: ../accountservice
     container_name: accountservice
     ports:
       - 5028:80
@@ -46,6 +47,7 @@ services:
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
   transactionservice:
     image: transactionservice:dev
+    build: ../transactionservice
     container_name: transactionservice
     ports:
       - 5068:80
