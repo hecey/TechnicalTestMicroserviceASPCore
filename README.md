@@ -92,7 +92,7 @@ Upload image.
  docker push hecey/{NameOfImage}
  ```
 
-## If auto create of Database is needed
+## If auto created Database is needed
 
 (I didn't need it, instead I used a script on the SQLServer Docker Container)
 
