@@ -10,7 +10,6 @@ namespace ClientService.Repositories
         public ClientRepository(DataContext context) : base(context)
         {
             _context = context;
-
         }
     }
 }

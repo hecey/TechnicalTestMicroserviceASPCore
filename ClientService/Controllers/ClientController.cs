@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using ClientService.DTOs;
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using ClientService.Repositories;
 
 namespace ClientService.Controllers
 {

@@ -4,9 +4,9 @@ using AccountService.DTOs;
 using AccountService.Profiles;
 using AutoMapper;
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
+using AccountService.Repositories;
 
 namespace AccountService.Tests
 {

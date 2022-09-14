@@ -2,7 +2,6 @@ using AccountService.Clients;
 using AccountService.Data;
 using AccountService.Repositories;
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
 using Hecey.TTM.Common.Settings;
 using Microsoft.EntityFrameworkCore;
 

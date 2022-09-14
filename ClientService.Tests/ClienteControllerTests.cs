@@ -3,7 +3,7 @@ using ClientService.Controllers;
 using ClientService.DTOs;
 using ClientService.Profiles;
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
+using ClientService.Repositories;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 

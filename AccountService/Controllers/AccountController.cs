@@ -2,7 +2,7 @@
 using AccountService.DTOs;
 using AutoMapper;
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
+using AccountService.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Controllers
