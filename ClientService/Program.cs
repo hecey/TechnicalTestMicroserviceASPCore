@@ -19,8 +19,6 @@ builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNa
 // Add services to the container.
 sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).Get<SqlServerSettings>();
 
-//var sqlServerSettings1 = sqlServerSettings with { Host = Environment.GetEnvironmentVariable("Host") };
-
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
 builder.Services.AddScoped<IClientRepository<Client>, ClientRepository<Client>>();
@@ -28,11 +26,16 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 
 app.UseHttpsRedirection();

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using TransactionService.Clients;
 using TransactionService.DTOs;
+using TransactionService.Repositories;
 
 namespace TransactionService.Controllers
 {
@@ -36,14 +36,29 @@ namespace TransactionService.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionDto>> GetByIdAsync(Guid id)
         {
-            var Transaction = await _repository.GetAsync(id);
-            if (Transaction == null)
+            var transaction = await _repository.GetAsync(id);
+            if (transaction == null)
             {
                 return NotFound("Transaction not found");
             }
-            var TransactionDto = _mapper.Map<TransactionDto>(Transaction);
+            var transactionDto = _mapper.Map<TransactionDto>(transaction);
 
-            return Ok(TransactionDto);
+            return Ok(transactionDto);
+        }
+
+        [HttpGet("ReportByClient/{id}/{startDate}/{endDate}")]
+        public async Task<ActionResult<IEnumerable<ReportDto>>> ReportByIDAndRangeDate(string id, DateTime startDate, DateTime endDate)
+        {
+
+
+            var transactions = await _repository.ReportByIDAndRangeDate(id, startDate, endDate);
+
+            if (!transactions.Any())
+            {
+                return BadRequest("Transactions not found in database");
+            }
+
+            return Ok(transactions);
         }
 
         [HttpPost]
@@ -79,7 +94,7 @@ namespace TransactionService.Controllers
             decimal balanceAvailable = 0;
             decimal lastBalance = 0;
 
-            var lastTransaction = await _repository.LastTransactionByAccount(accountDto.Id);
+            var lastTransaction = await _repository.LastTransactionByAccount(accountDto.Number!);
 
             lastBalance = lastTransaction is not null ?
                               lastTransaction.Balance :
@@ -103,7 +118,7 @@ namespace TransactionService.Controllers
                 return BadRequest("No se ha definido limite diario en el sistema");
             }
 
-            var amountOfTodayWithdrawn = await _repository.FindTodaysBalanceUsed(accountDto.Id);
+            var amountOfTodayWithdrawn = await _repository.FindTodaysBalanceUsed(accountDto.Number!);
 
             if ((dailyLimitForWithdrawn - amountOfTodayWithdrawn) <= 0)
             {
@@ -117,7 +132,6 @@ namespace TransactionService.Controllers
             {
                 Amount = createTransactionDto.Amount,
                 Balance = balanceAvailable,
-                AccountId = accountDto.Id,
                 AccountNumber = createTransactionDto.AccountNumber
             };
 
@@ -144,7 +158,6 @@ namespace TransactionService.Controllers
 
             transactionDB.Amount = updateTransactionDto.Amount;
             transactionDB.Balance = updateTransactionDto.Balance;
-            transactionDB.AccountId = updateTransactionDto.AccountId;
 
             _repository.Update(transactionDB);
             await _repository.SaveAsync();

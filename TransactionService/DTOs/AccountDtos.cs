@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TransactionService.DTOs
+﻿namespace TransactionService.DTOs
 {
     public record AccountDto(
         Guid Id,
@@ -8,5 +6,6 @@ namespace TransactionService.DTOs
         string? Type,
         decimal InitialBalance,
         bool Status,
-        Guid ClientId);
+        string? ClientIdentification,
+        string ClientName);
 }

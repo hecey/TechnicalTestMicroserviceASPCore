@@ -5,6 +5,7 @@
          string? Type,
          decimal Amount,
          decimal Balance,
+         DateTime Date,
          string? AccountNumber);
     public record CreateTransactionDto(
          decimal Amount,
@@ -13,6 +14,5 @@
          Guid Id,
          decimal Amount,
          decimal Balance,
-         Guid AccountId,
          string? AccountNumber);
 }

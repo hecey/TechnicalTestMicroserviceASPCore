@@ -13,11 +13,8 @@ namespace Hecey.TTM.Common.Entities
         [Precision(14, 2)]
         public decimal InitialBalance { get; set; }
         public bool Status { get; set; }
-        [JsonIgnore]
-        public Client Client { get; set; } = null!;
-        public Guid ClientId { get; set; }
-
-        public ICollection<Transaction>? Transaction { get; set; }
-
+        public string? ClientIdentification { get; set; }
+        [Required]
+        public string? ClientName { get; set; }
     }
 }

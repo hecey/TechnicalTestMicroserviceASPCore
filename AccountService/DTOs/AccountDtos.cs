@@ -6,7 +6,8 @@
         string? Type,
         decimal InitialBalance,
         bool Status,
-        Guid ClientId);
+        string? ClientIdentification,
+        string ClientName);
     public record CreateAccountDto(
         string? Number,
         string? Type,
@@ -17,6 +18,5 @@
         string? Number,
         string? Type,
         decimal InitialBalance,
-        bool Status,
-        Guid ClientId);
+        bool Status);
 }

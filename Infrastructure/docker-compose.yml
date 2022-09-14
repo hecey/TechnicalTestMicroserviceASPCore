@@ -53,6 +53,7 @@ services:
         UserId: "sa"
         Password: "Sql1234!"
         RemoteClientServiceHTTPSPort: "7149"
+        isDevelopment: "true"
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
@@ -73,6 +74,8 @@ services:
         UserId: "sa"
         Password: "Sql1234!"
         RemoteAccountServiceHTTPSPort: "7002"
+        RemoteClientServiceHTTPSPort: "7149"
+        isDevelopment: "true"
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/

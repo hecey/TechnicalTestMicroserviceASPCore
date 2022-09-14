@@ -45,7 +45,8 @@ CREATE TABLE [Account] (
     [Type] nvarchar(max) NULL,
     [InitialBalance] decimal(14,2) NOT NULL,
     [Status] bit NOT NULL,
-    [ClientId] uniqueidentifier NOT NULL,
+    [ClientIdentification] nvarchar(max) NOT NULL,
+    [ClientName] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_Account] PRIMARY KEY ([Id]),
 );
 GO
@@ -66,10 +67,10 @@ GO
 
 CREATE TABLE [Transaction] (
     [Id] uniqueidentifier NOT NULL,
+    [Type] nvarchar(max) NULL,
     [Date] datetime2 NOT NULL,
     [Amount] decimal(18,4) NOT NULL,
     [Balance] decimal(18,4) NOT NULL,
-    [AccountId] uniqueidentifier NOT NULL,
     [AccountNumber] nvarchar(max) NOT NULL DEFAULT N'',
     CONSTRAINT [PK_Transaction] PRIMARY KEY ([Id]),
 );

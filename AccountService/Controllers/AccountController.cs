@@ -19,7 +19,6 @@ namespace AccountService.Controllers
             _repository = repository;
             _mapper = mapper;
             _remoteClientService = remoteClientService;
-
         }
 
         [HttpGet]
@@ -41,6 +40,20 @@ namespace AccountService.Controllers
             var AccountDto = _mapper.Map<AccountDto>(Account);
 
             return Ok(AccountDto);
+        }
+
+
+        [HttpGet("GetByClient/{id}")]
+        public async Task<ActionResult<AccountDto>> GetByClientIdentificationAsync(String id)
+        {
+            var accounts = await _repository.FindAsync(x => x.ClientIdentification == id, null, "");
+            if (accounts == null)
+            {
+                return BadRequest("Account not found");
+            }
+            var AccountsDto = _mapper.Map<IEnumerable<AccountDto>>(accounts);
+
+            return Ok(AccountsDto);
         }
 
         [HttpPost]
@@ -65,23 +78,21 @@ namespace AccountService.Controllers
                 return BadRequest("Client not found in database");
             }
 
-            var client = _mapper.Map<Client>(clientDto);
-
             var newAccount = new Account
             {
                 Id = Guid.NewGuid(),
-                ClientId = clientDto.Id,
+                ClientIdentification = createAccountDto.ClientIdentification,
                 Status = createAccountDto.Status,
                 Number = createAccountDto.Number,
                 InitialBalance = createAccountDto.InitialBalance,
                 Type = createAccountDto.Type,
+                ClientName = clientDto.Name
             };
 
             _repository.Add(newAccount);
             await _repository.SaveAsync();
 
             var AccountDto = _mapper.Map<AccountDto>(newAccount);
-
 
             return CreatedAtAction(nameof(GetByNumberAsync), new { id = newAccount.Id }, AccountDto);
         }
@@ -101,7 +112,6 @@ namespace AccountService.Controllers
 
             AccountInDB.Type = updateAccountDto.Type;
             AccountInDB.InitialBalance = updateAccountDto.InitialBalance;
-            AccountInDB.ClientId = updateAccountDto.ClientId;
             AccountInDB.Status = updateAccountDto.Status;
 
             _repository.Update(AccountInDB);

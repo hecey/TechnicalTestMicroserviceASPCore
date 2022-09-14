@@ -8,15 +8,15 @@ namespace AccountService.Clients
         private readonly HttpClient httpClient;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public RemoteClientService(HttpClient httpClient,IHttpClientFactory httpClientFactory)
+        public RemoteClientService(HttpClient httpClient, IHttpClientFactory httpClientFactory)
         {
             this.httpClient = httpClient;
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<ClientDto> GetClientByIdAsync(string ClientId)
+        public async Task<ClientDto> GetClientByIdAsync(string ClientIdentificator)
         {
-            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Client/{ClientId}");
+            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Client/{ClientIdentificator}");
             if (res.IsSuccessStatusCode)
             {
                 var client = await res.Content.ReadFromJsonAsync<ClientDto>();

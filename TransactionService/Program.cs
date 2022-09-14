@@ -1,19 +1,19 @@
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
 using Hecey.TTM.Common.Settings;
 using Microsoft.EntityFrameworkCore;
 using TransactionService.Clients;
 using TransactionService.Data;
 using TransactionService.Repositories;
 
-var isDevelopment=true;
-SqlServerSettings sqlServerSettings = new (){
-     Host=Environment.GetEnvironmentVariable("Host"),
-     Port=Environment.GetEnvironmentVariable("Port"),
-     Database=Environment.GetEnvironmentVariable("Database"),
-     UserId=Environment.GetEnvironmentVariable("UserId"),
-     Password=Environment.GetEnvironmentVariable("Password")
-     };
+var isDevelopment = Environment.GetEnvironmentVariable("isDevelopment");
+SqlServerSettings sqlServerSettings = new()
+{
+    Host = Environment.GetEnvironmentVariable("Host"),
+    Port = Environment.GetEnvironmentVariable("Port"),
+    Database = Environment.GetEnvironmentVariable("Database"),
+    UserId = Environment.GetEnvironmentVariable("UserId"),
+    Password = Environment.GetEnvironmentVariable("Password")
+};
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -25,10 +25,12 @@ sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
 builder.Services.AddHttpClient<RemoteAccountService>(client => client.BaseAddress = new Uri($"https://{sqlServerSettings.Host}:{Environment.GetEnvironmentVariable("RemoteAccountServiceHTTPSPort")}/api"))
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() {
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                {
                     // Return `true` to allow certificates that are untrusted/invalid
-                    ServerCertificateCustomValidationCallback = (isDevelopment)?HttpClientHandler.DangerousAcceptAnyServerCertificateValidator:null
+                    ServerCertificateCustomValidationCallback = (isDevelopment == "true") ? HttpClientHandler.DangerousAcceptAnyServerCertificateValidator : null
                 });
+
 builder.Services.AddScoped<ITransactionRepository<Transaction>, TransactionRepository<Transaction>>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
