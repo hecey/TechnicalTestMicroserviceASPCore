@@ -1,17 +1,20 @@
 using ClientService.Data;
 using ClientService.Repositories;
 using Hecey.TTM.Common.Entities;
-using Hecey.TTM.Common.Repositories;
 using Hecey.TTM.Common.Settings;
 using Microsoft.EntityFrameworkCore;
+using Hecey.TTM.Common.MassTransit;
 
-SqlServerSettings sqlServerSettings = new (){
+SqlServerSettings sqlServerSettings;
+if(Environment.GetEnvironmentVariable("Host") is not null){
+sqlServerSettings = new (){
      Host=Environment.GetEnvironmentVariable("Host"),
      Port=Environment.GetEnvironmentVariable("Port"),
      Database=Environment.GetEnvironmentVariable("Database"),
      UserId=Environment.GetEnvironmentVariable("UserId"),
      Password=Environment.GetEnvironmentVariable("Password")
      };
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,9 @@ sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
+
+builder.Services.AddMassTransitWithRabbitMq();
+
 builder.Services.AddScoped<IClientRepository<Client>, ClientRepository<Client>>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -36,7 +42,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.UseHttpsRedirection();
 

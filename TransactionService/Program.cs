@@ -4,7 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using TransactionService.Clients;
 using TransactionService.Data;
 using TransactionService.Repositories;
+using Polly;
+using Polly.Timeout;
 
+var jitter = new Random();
 var isDevelopment = Environment.GetEnvironmentVariable("isDevelopment");
 SqlServerSettings sqlServerSettings = new()
 {
@@ -25,6 +28,16 @@ sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
 builder.Services.AddHttpClient<RemoteAccountService>(client => client.BaseAddress = new Uri($"https://{sqlServerSettings.Host}:{Environment.GetEnvironmentVariable("RemoteAccountServiceHTTPSPort")}/api"))
+                .AddTransientHttpErrorPolicy(builder => builder.Or<TimeoutRejectedException>().WaitAndRetryAsync(
+                    5,
+                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                    + TimeSpan.FromMilliseconds(jitter.Next(0,1000))
+                ))
+                .AddTransientHttpErrorPolicy(builder => builder.Or<TimeoutRejectedException>().CircuitBreakerAsync(
+                    3,
+                    TimeSpan.FromSeconds(15)
+                ))
+                .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(1))
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                 {
                     // Return `true` to allow certificates that are untrusted/invalid

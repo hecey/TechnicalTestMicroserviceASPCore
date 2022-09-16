@@ -3,6 +3,8 @@ using ClientService.DTOs;
 using Hecey.TTM.Common.Entities;
 using Microsoft.AspNetCore.Mvc;
 using ClientService.Repositories;
+using MassTransit;
+using Hecey.TTM.ClientContracts;
 
 namespace ClientService.Controllers
 {
@@ -11,27 +13,26 @@ namespace ClientService.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepository<Client> _repository;
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly IMapper _mapper;
-        public ClientController(IClientRepository<Client> repository, IMapper mapper)
+        public ClientController(IClientRepository<Client> repository, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _repository = repository;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ClientDto>>> GetAsync()
         {
-
             var clients = (List<Client>)await _repository.GetAsync();
             var clientsDto = _mapper.Map<IEnumerable<ClientDto>>(clients);
             return clientsDto.Any() ? Ok(clientsDto) : NoContent();
-
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ClientDto>> GetByIdAsync(string id)
         {
-
             var client = await _repository.FindAsync(x => x.Identification == id);
             if (client == null)
             {
@@ -40,7 +41,6 @@ namespace ClientService.Controllers
             var clientDto = _mapper.Map<ClientDto>(client);
 
             return Ok(clientDto);
-
         }
 
         [HttpPost]
@@ -51,21 +51,17 @@ namespace ClientService.Controllers
                 return BadRequest(ModelState);
             }
 
-
             if (createClientDto.Identification is null)
             {
                 return BadRequest("No hay identification de client to add");
             }
 
-
             var client = await _repository.FindAsync(x => x.Identification == createClientDto.Identification);
-
 
             if (client is not null)
             {
                 return BadRequest("Already in database");
             }
-
 
             var newClient = new Client
             {
@@ -82,6 +78,17 @@ namespace ClientService.Controllers
 
             _repository.Add(newClient);
             await _repository.SaveAsync();
+
+            await _publishEndpoint.Publish(new ClientCreated(
+                newClient.Id,
+                newClient.Name,
+                newClient.Genre,
+                newClient.Age,
+                newClient.Identification,
+                newClient.Address,
+                newClient.Phone,
+                newClient.Password,
+                newClient.Status));
 
             var clientDto = _mapper.Map<ClientDto>(newClient);
 
@@ -103,12 +110,10 @@ namespace ClientService.Controllers
 
             var clientDB = await _repository.FindAsync(x => x.Identification == updateClientDto.Identification);
 
-
             if (clientDB is null)
             {
                 return BadRequest("client not in database");
             }
-
 
             clientDB.Name = updateClientDto.Name;
             clientDB.Genre = updateClientDto.Genre;
@@ -122,13 +127,23 @@ namespace ClientService.Controllers
             _repository.Update(clientDB);
             await _repository.SaveAsync();
 
+             await _publishEndpoint.Publish(new ClientUpdated(
+                clientDB.Id,
+                clientDB.Name,
+                clientDB.Genre,
+                clientDB.Age,
+                clientDB.Identification,
+                clientDB.Address,
+                clientDB.Phone,
+                clientDB.Password,
+                clientDB.Status));
+
             var clientDto = _mapper.Map<ClientDto>(clientDB);
             return Ok(clientDto);
         }
         [HttpDelete]
-        public async Task<ActionResult<List<ClientDto>>> DeletAsync(ClientDto clientDto)
+        public async Task<ActionResult<List<ClientDto>>> DeleteAsync(ClientDto clientDto)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -141,16 +156,24 @@ namespace ClientService.Controllers
 
             var clientDB = await _repository.FindAsync(x => x.Identification == clientDto.Identification);
 
-
             if (clientDB is null)
             {
                 return NotFound("client not found");
             }
 
-
-
             _repository.Delete(clientDB.Id);
             await _repository.SaveAsync();
+
+            await _publishEndpoint.Publish(new ClientDeleted(
+                clientDB.Id,
+                clientDB.Name,
+                clientDB.Genre,
+                clientDB.Age,
+                clientDB.Identification,
+                clientDB.Address,
+                clientDB.Phone,
+                clientDB.Password,
+                clientDB.Status));
 
             return Ok(clientDB);
         }

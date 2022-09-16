@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/hecey/TechnicalTestMicroserviceASPCore</RepositoryUrl>
-    <PackageVersion>1.0.6</PackageVersion>
+    <PackageVersion>1.0.7</PackageVersion>
     <RootNamespace>Hecey.TTM.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <PackageId>Hecey.TTM.$(AssemblyName)</PackageId>
     <AssemblyName>Hecey.TTM.$(MSBuildProjectName)</AssemblyName>
@@ -14,6 +14,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit.RabbitMq" Version="8.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
   </ItemGroup>
 
 </Project>

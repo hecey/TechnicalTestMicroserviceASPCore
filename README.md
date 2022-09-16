@@ -103,13 +103,25 @@ try
 {
    if(databaseCreator!=null)
    {
-   var databaseCreator  = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
-       if(!databaseCreator.CanConnect())databaseCreator.Create();
-       if(!databaseCreator.HasTables())databaseCreator.CreateTables();
+      var databaseCreator  = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+          if(!databaseCreator.CanConnect())databaseCreator.Create();
+          if(!databaseCreator.HasTables())databaseCreator.CreateTables();
+   }
+}
 catch(Exception ex)
 {
-   Console.WriteLine ( ex.Message ) ;
+   Console.WriteLine ( ex.Message );
 }
+```
+
+## EF Migrations - Generate database script
+
+```Powershell
+dotnet ef migrations add InitialCreate
+```
+
+```Powershell
+dotnet ef migrations script
 ```
 
 ## Postman Collections

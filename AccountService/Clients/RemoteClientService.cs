@@ -1,22 +1,19 @@
 ﻿using ClientService.DTOs;
 
-
 namespace AccountService.Clients
 {
     public class RemoteClientService
     {
         private readonly HttpClient httpClient;
-        private readonly IHttpClientFactory _httpClientFactory;
 
-        public RemoteClientService(HttpClient httpClient, IHttpClientFactory httpClientFactory)
+        public RemoteClientService(HttpClient httpClient)
         {
             this.httpClient = httpClient;
-            _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<ClientDto> GetClientByIdAsync(string ClientIdentificator)
+        public async Task<ClientDto> GetClientByIdAsync(string ClientIdentification)
         {
-            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Client/{ClientIdentificator}");
+            HttpResponseMessage res = await httpClient.GetAsync($"{httpClient.BaseAddress}/Client/{ClientIdentification}");
             if (res.IsSuccessStatusCode)
             {
                 var client = await res.Content.ReadFromJsonAsync<ClientDto>();

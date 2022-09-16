@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Hecey.TTM.Common.Entities;
+using AccountService.Entities;
 
 namespace AccountService.Data
 {
@@ -11,5 +11,6 @@ namespace AccountService.Data
         }
 
         public DbSet<Account> Account { get; set; } = default!;
+        public DbSet<Client> Client { get; set; } = default!;
     }
 }
