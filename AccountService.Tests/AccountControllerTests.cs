@@ -3,7 +3,7 @@ using AccountService.Controllers;
 using AccountService.DTOs;
 using AccountService.Profiles;
 using AutoMapper;
-using Hecey.TTM.Common.Entities;
+using AccountService.Entities;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using AccountService.Repositories;
@@ -26,13 +26,14 @@ namespace AccountService.Tests
         public async void Get_Returns_Ok_Response_List_of_Accounts_When_Data_Exist()
         {
             //Arrange
-            int count = 5;
+            const int count = 5;
+            var fakeAccount = A.CollectionOfDummy<Account>(count).AsEnumerable();
             var fakeClients = A.CollectionOfDummy<Account>(count).AsEnumerable();
-            var _repository = A.Fake<IAccountRepository<Account>>();
-            var remoteClientService = A.Fake<RemoteClientService>();
+            var _accountRepository = A.Fake<IAccountRepository<Account>>();
+            var _clientRepository = A.Fake<IAccountRepository<Client>>();
 
-            A.CallTo(() => _repository.GetAsync()).Returns(Task.FromResult(fakeClients));
-            var controller = new AccountController(_repository, _mapper!, remoteClientService);
+            A.CallTo(() => _accountRepository.GetAsync()).Returns(Task.FromResult(fakeAccount));
+            var controller = new AccountController(_accountRepository, _mapper!, _clientRepository);
 
             //Act
             var actionResult = await controller.GetAsync();
@@ -46,13 +47,14 @@ namespace AccountService.Tests
         public async void Get_Returns_NoContent_Response_When_Data_Not_Exist()
         {
             //Arrange
-            int count = 0;
+             const int count = 0;
+            var fakeAccount = A.CollectionOfDummy<Account>(count).AsEnumerable();
             var fakeClients = A.CollectionOfDummy<Account>(count).AsEnumerable();
-            var _repository = A.Fake<IAccountRepository<Account>>();
-            var remoteClientService = A.Fake<RemoteClientService>();
+            var _accountRepository = A.Fake<IAccountRepository<Account>>();
+            var _clientRepository = A.Fake<IAccountRepository<Client>>();
 
-            A.CallTo(() => _repository.GetAsync()).Returns(Task.FromResult(fakeClients));
-            var controller = new AccountController(_repository, _mapper!, remoteClientService);
+            A.CallTo(() => _accountRepository.GetAsync()).Returns(Task.FromResult(fakeAccount));
+            var controller = new AccountController(_accountRepository, _mapper!, _clientRepository);
 
             //Act
             var actionResult = await controller.GetAsync();

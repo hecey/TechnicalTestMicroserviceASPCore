@@ -1,15 +1,15 @@
 using MassTransit;
 using Hecey.TTM.ClientContracts;
-using Hecey.TTM.Common.Repositories;
 using ClientService.DTOs;
 using AccountService.Entities;
+using AccountService.Repositories;
 
 namespace AccountService.Consumers{
     public class ClientDeletedConsumer : IConsumer<ClientDeleted>
     {
-        private readonly IRepository<Client> _repository;
+        private readonly IClientRepository<Client> _repository;
 
-        public ClientDeletedConsumer(IRepository<Client> repository){
+        public ClientDeletedConsumer(IClientRepository<Client> repository){
             _repository=repository;
         }
 

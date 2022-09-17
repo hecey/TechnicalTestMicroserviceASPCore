@@ -1,14 +1,14 @@
 using MassTransit;
 using Hecey.TTM.ClientContracts;
-using Hecey.TTM.Common.Repositories;
 using AccountService.Entities;
+using AccountService.Repositories;
 
 namespace AccountService.Consumers{
     public class ClientUpdatedConsumer : IConsumer<ClientUpdated>
     {
-        private readonly IRepository<Client> _repository;
+        private readonly IClientRepository<Client> _repository;
 
-        public ClientUpdatedConsumer(IRepository<Client> repository){
+        public ClientUpdatedConsumer(IClientRepository<Client> repository){
             _repository=repository;
         }
 

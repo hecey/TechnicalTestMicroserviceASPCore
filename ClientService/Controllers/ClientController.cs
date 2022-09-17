@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using ClientService.DTOs;
-using Hecey.TTM.Common.Entities;
 using Microsoft.AspNetCore.Mvc;
 using ClientService.Repositories;
 using MassTransit;
 using Hecey.TTM.ClientContracts;
+using ClientService.Entities;
 
 namespace ClientService.Controllers
 {
@@ -82,12 +82,7 @@ namespace ClientService.Controllers
             await _publishEndpoint.Publish(new ClientCreated(
                 newClient.Id,
                 newClient.Name,
-                newClient.Genre,
-                newClient.Age,
                 newClient.Identification,
-                newClient.Address,
-                newClient.Phone,
-                newClient.Password,
                 newClient.Status));
 
             var clientDto = _mapper.Map<ClientDto>(newClient);
@@ -130,12 +125,7 @@ namespace ClientService.Controllers
              await _publishEndpoint.Publish(new ClientUpdated(
                 clientDB.Id,
                 clientDB.Name,
-                clientDB.Genre,
-                clientDB.Age,
                 clientDB.Identification,
-                clientDB.Address,
-                clientDB.Phone,
-                clientDB.Password,
                 clientDB.Status));
 
             var clientDto = _mapper.Map<ClientDto>(clientDB);
@@ -167,12 +157,7 @@ namespace ClientService.Controllers
             await _publishEndpoint.Publish(new ClientDeleted(
                 clientDB.Id,
                 clientDB.Name,
-                clientDB.Genre,
-                clientDB.Age,
                 clientDB.Identification,
-                clientDB.Address,
-                clientDB.Phone,
-                clientDB.Password,
                 clientDB.Status));
 
             return Ok(clientDB);

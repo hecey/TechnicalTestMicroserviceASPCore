@@ -1,4 +1,4 @@
-﻿using Hecey.TTM.Common.Entities;
+﻿using TransactionService.Entities;
 using Hecey.TTM.Common.Repositories;
 using TransactionService.DTOs;
 

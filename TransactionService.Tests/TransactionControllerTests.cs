@@ -1,5 +1,5 @@
 using AutoMapper;
-using Hecey.TTM.Common.Entities;
+using TransactionService.Entities;
 using TransactionService.Repositories;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;

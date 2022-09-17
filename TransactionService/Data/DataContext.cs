@@ -1,4 +1,4 @@
-﻿using Hecey.TTM.Common.Entities;
+﻿using TransactionService.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace TransactionService.Data

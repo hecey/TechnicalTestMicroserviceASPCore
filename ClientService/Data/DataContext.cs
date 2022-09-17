@@ -1,4 +1,4 @@
-﻿using Hecey.TTM.Common.Entities;
+﻿using ClientService.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClientService.Data

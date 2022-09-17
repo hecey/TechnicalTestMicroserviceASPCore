@@ -1,7 +1,7 @@
 ﻿using AccountService.DTOs;
 using AutoMapper;
 using ClientService.DTOs;
-using Hecey.TTM.Common.Entities;
+using AccountService.Entities;
 
 namespace AccountService.Profiles
 {

@@ -47,6 +47,7 @@ services:
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
+ 
   accountservice:
     image: accountservice:dev
     build: ../accountservice

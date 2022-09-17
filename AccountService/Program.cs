@@ -9,27 +9,36 @@ using Polly;
 using Polly.Timeout;
 
 var isDevelopment = Environment.GetEnvironmentVariable("isDevelopment");
-SqlServerSettings sqlServerSettings = new()
-{
-    Host = Environment.GetEnvironmentVariable("Host"),
-    Port = Environment.GetEnvironmentVariable("Port"),
-    Database = Environment.GetEnvironmentVariable("Database"),
-    UserId = Environment.GetEnvironmentVariable("UserId"),
-    Password = Environment.GetEnvironmentVariable("Password")
-};
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 
-sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).Get<SqlServerSettings>();
+SqlServerSettings sqlServerSettings;
+if (Environment.GetEnvironmentVariable("Host") is not null)
+{
+    sqlServerSettings = new()
+    {
+        Host = Environment.GetEnvironmentVariable("Host"),
+        Port = Environment.GetEnvironmentVariable("Port"),
+        Database = Environment.GetEnvironmentVariable("Database"),
+        UserId = Environment.GetEnvironmentVariable("UserId"),
+        Password = Environment.GetEnvironmentVariable("Password")
+    };
+}
+else
+{
+    sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).Get<SqlServerSettings>();
+}
 
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
-
-builder.Services.AddMassTransitWithRabbitMq();
+    options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")))
+    .AddMassTransitWithRabbitMq();
 
 AddRemoteClientService(isDevelopment, sqlServerSettings, builder);
+
+//For MassTransitConsumers
+builder.Services.AddScoped<IClientRepository<Client>, ClientRepository<Client>>();
 
 builder.Services.AddScoped<IAccountRepository<Account>, AccountRepository<Account>>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

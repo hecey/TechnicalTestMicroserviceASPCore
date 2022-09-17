@@ -12,7 +12,6 @@ namespace AccountService.Controllers
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
-        //private readonly RemoteClientService _remoteClientService;
         private readonly IAccountRepository<Account> _accountRepository;
 
         private readonly IRepository<Client> _clientRepository;
@@ -22,7 +21,6 @@ namespace AccountService.Controllers
             _accountRepository = accountRepository;
             _mapper = mapper;
             _clientRepository= clientRepository;
-            //_remoteClientService = remoteClientService;
         }
 
         [HttpGet]

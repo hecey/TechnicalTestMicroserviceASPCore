@@ -1,15 +1,14 @@
 using MassTransit;
 using Hecey.TTM.ClientContracts;
-using Hecey.TTM.Common.Repositories;
-using ClientService.DTOs;
 using AccountService.Entities;
+using AccountService.Repositories;
 
 namespace AccountService.Consumers{
     public class ClientCreatedConsumer : IConsumer<ClientCreated>
     {
-        private readonly IRepository<Client> _repository;
+        private readonly IClientRepository<Client> _repository;
 
-        public ClientCreatedConsumer(IRepository<Client> repository){
+        public ClientCreatedConsumer(IClientRepository<Client> repository){
             _repository=repository;
         }
 
@@ -21,8 +20,10 @@ namespace AccountService.Consumers{
             if(client is not null) return;
 
             client= new Client{
+                Id = message.Id,
                 Identification = message.Identification,
-                Name = message.Name
+                Name = message.Name,
+                Status = message.Status
             };
 
             _repository.Add(client);

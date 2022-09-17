@@ -50,6 +50,14 @@ CREATE TABLE [Account] (
     CONSTRAINT [PK_Account] PRIMARY KEY ([Id]),
 );
 GO
+CREATE TABLE [Client] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(max) NULL,
+    [Identification] nvarchar(max) NULL,
+    [Status] bit NOT NULL,
+    CONSTRAINT [PK_Client] PRIMARY KEY ([Id])
+);
+GO
 
 USE [master]
 IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'TransactionsDB')

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Hecey.TTM.Common.Entities;
+using TransactionService.Entities;
 using Microsoft.AspNetCore.Mvc;
 using TransactionService.Clients;
 using TransactionService.DTOs;
@@ -49,8 +49,6 @@ namespace TransactionService.Controllers
         [HttpGet("ReportByClient/{id}/{startDate}/{endDate}")]
         public async Task<ActionResult<IEnumerable<ReportDto>>> ReportByIDAndRangeDate(string id, DateTime startDate, DateTime endDate)
         {
-
-
             var transactions = await _repository.ReportByIDAndRangeDate(id, startDate, endDate);
 
             if (!transactions.Any())
@@ -85,21 +83,11 @@ namespace TransactionService.Controllers
                 return BadRequest("Account not found in database");
             }
 
-            // Los valores cuando son crédito son positivos, y los débitos son negativos.
-            // Debe almacenarse el saldo disponible en cada transacción dependiendo del
-            // tipo de Transaction.
-
-            // Si el saldo es menor a la transacción débito, debe desplegar mensaje
-            // “Saldo no disponible”
-            decimal balanceAvailable = 0;
-            decimal lastBalance = 0;
-
             var lastTransaction = await _repository.LastTransactionByAccount(accountDto.Number!);
 
-            lastBalance = lastTransaction is not null ?
-                              lastTransaction.Balance :
-                              accountDto.InitialBalance;
-
+            decimal lastBalance = lastTransaction is not null ?
+                  lastTransaction.Balance :
+                  accountDto.InitialBalance;
             if (createTransactionDto.Amount < 0)
             {
                 if (lastBalance + createTransactionDto.Amount < 0)
@@ -108,7 +96,13 @@ namespace TransactionService.Controllers
                 }
             }
 
-            balanceAvailable = lastBalance + createTransactionDto.Amount;
+            // Los valores cuando son crédito son positivos, y los débitos son negativos.
+            // Debe almacenarse el saldo disponible en cada transacción dependiendo del
+            // tipo de Transaction.
+
+            // Si el saldo es menor a la transacción débito, debe desplegar mensaje
+            // “Saldo no disponible”
+            decimal balanceAvailable = lastBalance + createTransactionDto.Amount;
 
             // Se debe tener un parámetro de limite diario de retiro (valor tope 1000$)
             var dailyLimitForWithdrawn = _configRoot.GetValue<decimal>("dailyLimitForWithdrawn");
@@ -126,8 +120,6 @@ namespace TransactionService.Controllers
             }
 
             //Save
-            var account = _mapper.Map<Account>(accountDto);
-
             var newTransaction = new Transaction
             {
                 Amount = createTransactionDto.Amount,

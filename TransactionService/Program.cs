@@ -1,4 +1,4 @@
-using Hecey.TTM.Common.Entities;
+using TransactionService.Entities;
 using Hecey.TTM.Common.Settings;
 using Microsoft.EntityFrameworkCore;
 using TransactionService.Clients;
@@ -7,26 +7,32 @@ using TransactionService.Repositories;
 using Polly;
 using Polly.Timeout;
 
-var jitter = new Random();
 var isDevelopment = Environment.GetEnvironmentVariable("isDevelopment");
-SqlServerSettings sqlServerSettings = new()
-{
-    Host = Environment.GetEnvironmentVariable("Host"),
-    Port = Environment.GetEnvironmentVariable("Port"),
-    Database = Environment.GetEnvironmentVariable("Database"),
-    UserId = Environment.GetEnvironmentVariable("UserId"),
-    Password = Environment.GetEnvironmentVariable("Password")
-};
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 
-sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).Get<SqlServerSettings>();
+SqlServerSettings sqlServerSettings;
+if(Environment.GetEnvironmentVariable("Host") is not null){
+    sqlServerSettings = new()
+    {
+        Host = Environment.GetEnvironmentVariable("Host"),
+        Port = Environment.GetEnvironmentVariable("Port"),
+        Database = Environment.GetEnvironmentVariable("Database"),
+        UserId = Environment.GetEnvironmentVariable("UserId"),
+        Password = Environment.GetEnvironmentVariable("Password")
+    };
+}else{
+    sqlServerSettings = builder.Configuration.GetSection(nameof(SqlServerSettings)).Get<SqlServerSettings>();
+}
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(sqlServerSettings.DefaultContext ?? throw new InvalidOperationException("Connection string 'DefaultContext' not found.")));
+
+var jitter = new Random();
 builder.Services.AddHttpClient<RemoteAccountService>(client => client.BaseAddress = new Uri($"https://{sqlServerSettings.Host}:{Environment.GetEnvironmentVariable("RemoteAccountServiceHTTPSPort")}/api"))
                 .AddTransientHttpErrorPolicy(builder => builder.Or<TimeoutRejectedException>().WaitAndRetryAsync(
                     5,

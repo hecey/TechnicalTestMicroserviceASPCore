@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ClientService.DTOs;
-using Hecey.TTM.Common.Entities;
+using ClientService.Entities;
 
 namespace ClientService.Profiles
 {
@@ -10,7 +10,6 @@ namespace ClientService.Profiles
         {
             //Source => Dest
             CreateMap<Client, ClientDto>();
-
         }
     }
 }

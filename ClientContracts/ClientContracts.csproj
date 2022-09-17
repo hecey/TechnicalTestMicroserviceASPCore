@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/hecey/TechnicalTestMicroserviceASPCore</RepositoryUrl>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.1</PackageVersion>
     <RootNamespace>Hecey.TTM.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <PackageId>Hecey.TTM.$(AssemblyName)</PackageId>
     <AssemblyName>Hecey.TTM.$(MSBuildProjectName)</AssemblyName>
